@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 // Define the schema
-const userSchema = new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
+const studentSchema = new mongoose.Schema({
+    email: { type: String, required: true },
     password: { type: String, required: true },
     firstname: { type: String, required: true },
     lastname: { type: String, required: true },
@@ -13,6 +13,6 @@ const userSchema = new mongoose.Schema({
 });
 
 // Create the model
-const User = mongoose.model('User', userSchema);
+const Student = mongoose.model('student', studentSchema);
 
-module.exports = User;
+module.exports = Student;

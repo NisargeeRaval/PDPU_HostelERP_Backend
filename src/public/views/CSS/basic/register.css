@@ -1,0 +1,210 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:visited {
+    color: black;
+}
+
+body {
+    overflow-x: hidden;
+    background-color:#FAF9F6;
+    font-family: Merriweather,Georgia,serif;
+}
+
+.main-container {
+    margin-top: 3%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    width: 100vw;
+    flex-direction: column;
+    padding-bottom: 2.5%;
+}
+
+.container {
+    /* margin: 30% 0% 30% 0%; */
+    background-color: #1a1b1b; /* ff8600 */
+    width: 50%;
+    height: auto;
+    border-radius: 12px;
+}
+
+.image-container {
+    padding: 2% 2% 0% 0%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.image-container img {
+    border-top-left-radius: 12px;
+}
+
+.image-container h3 {
+    color: #ff8600;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.image-container h3:hover {
+    transform: scale(1.1);
+}
+
+.container img{
+    width: 25%;
+    height: 15%;
+}
+
+.register-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8% 0% 5% 0%;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.register-main div {
+    padding-bottom: 3%;
+    color:  white;
+}
+
+.register-main a {
+    padding-bottom: 3%;
+    color:#7a8790;
+    font-size: larger;
+}
+
+.register-main a:hover {
+    color: white;
+}
+
+.btn {
+    color: #ff8600;
+    background-color:#333434;
+    padding: 2% 5% 2% 5%;
+    font-size: larger;
+    font-weight: bolder;
+    border: none;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    color: white;
+    background-color: #ff8600;
+}
+
+label {
+    display: inline-block;
+    width: 150px;
+    text-align: left;
+    font-size: larger;
+}
+
+#email, #firstname, #lastname, #rollno, #mobileno, #parentsmobile, #address, #password {
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    font-size: larger;
+    color:white;
+    background: transparent;
+    border-bottom: 2px solid #7a8790;
+    text-indent: 3%;
+    border-bottom-left-radius: 0%;
+    border-bottom-right-radius: 0%;
+}
+
+#email:focus, #firstname:focus, #lastname:focus, #rollno:focus, #mobileno:focus, #parentsmobile:focus, #address:focus, #password:focus {
+    border-bottom: 2px solid #ff8600;
+}
+
+/* responsive */
+@media screen and (min-width: 800px) {
+    .container {
+        width: auto;
+        padding: 2% 4% 4% 4%;
+    }
+}
+
+@media screen and (min-width: 700px) and (max-width: 800px) {
+    .container {
+        width: auto;
+        padding: 2% 4% 4% 4%;
+    }
+
+    .image-container h3 {
+        font-size: 1rem;
+    }
+
+}
+
+@media screen and (min-width: 555px) and (max-width: 700px) {
+    .container {
+        width: auto;
+        padding: 2% 4% 4% 4%;
+    }
+
+}
+
+@media screen and (min-width: 450px) and (max-width: 555px) {
+    .container {
+        width: auto;
+        padding: 2% 4% 4% 4%;
+    }
+
+    * {
+        font-size: 0.95rem;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    * {
+        font-size: 0.85rem;
+    }
+    .container {
+        width: 80%;
+        height: auto;
+        padding: 1rem 0rem 1rem 0rem;
+    }
+
+    .image-container h3 {
+        display: none;
+    }
+
+    .image-container img {
+
+        position:relative;
+        border-top-left-radius: 0%;
+        width: 50%;
+    }
+
+    .register-main div {
+        display:flex;
+        flex-direction: column;
+        padding-bottom: 4%;
+        color:  white;
+    }
+
+    a {
+        align-items: center;
+    }
+
+    .register-main a {
+        margin-top: 3%;
+        padding-bottom: 5%;
+    }
+
+    .btn {
+        font-size:x-large;
+        margin-bottom: 10%;
+    }
+}

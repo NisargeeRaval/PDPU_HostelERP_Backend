@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <title>View Hostel</title>
+  <style>
+    .custom-btn {
+      background-color: #ff8600;
+      color: black;
+      border: none;
+    }
+
+    .custom-btn:hover {
+      background-color: black;
+      color: #ff8600;
+    }
+
+    .custom-alert {
+      background-color: #333434;
+      color: white;
+    }
+  </style>
+
+  <%- include('./nav.ejs') %>
+</head>
+
+<body>
+  <div id="editFormContainer" style="display: none;">
+    <!-- Edit form will be dynamically generated here -->
+  </div>
+
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10 text-center">
+        <h1>View Hostel Details</h1>
+        <hr class="my-4 border-4">
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <% if (Array.isArray(hostelData) && hostelData.length === 0) { %>
+    <div class="container">
+      <div class="alert alert-info custom-alert" role="alert">
+        No hostels found. Click below to add a hostel.
+        <a href="/hostel/createHostel" class="btn btn-primary custom-btn mx-2">Add Hostel</a>
+      </div>
+    </div>
+    <% } else { %>
+    <table class="table table-bordered mb-5">
+      <thead>
+        <tr>
+          <th>Hostel Name</th>
+          <th>Total Floors</th>
+          <th>Occupancy Per Room</th>
+          <th>Vacant seats</th>
+          <th>Type of Hostel</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% hostelData.forEach(function(hostel) { %>
+        <tr data-hostel='<%- JSON.stringify(hostel) %>'>
+          <td><%= hostel.hostelName %></td>
+          <td><%= hostel.totalFloors %></td>
+          <td><%= hostel.occupancyPerRoom %></td>
+          <td>0</td>
+          <td><%= hostel.hostelType %></td>
+          <td><%= hostel.status %></td>
+          <td>
+            <button type="button" class="btn btn-warning" id="<%= hostel._id %>" onclick="showEditForm(this)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="btn btn-danger" id="<%= hostel._id %>">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <% } %>
+  </div>
+
+</body>
+
+<script>
+  function showEditForm(button) {
+    const editFormContainer = document.getElementById('editFormContainer');
+    const rowData = button.closest('tr').getAttribute('data-hostel');
+    const hostelDetails = JSON.parse(rowData);
+
+    if (hostelDetails) {
+      // Construct the edit form HTML with the fetched details
+      const editFormHtml = `
+        <div class="container mt-5">
+          <div class="row justify-content-center">
+            <div class="col-md-10 text-center">
+              <h1>Update Hostel Details</h1>
+              <hr class="my-4 border-4">
+            </div>
+          </div>
+        </div>
+        <div class="container">
+          <form action="/hostel/api/update/?id=${hostelDetails._id}" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="hostelName" class="form-label">Hostel Name</label>
+              <input type="text" class="form-control" name="hostelName" value="${hostelDetails.hostelName}" required>
+            </div>
+            <div class="mb-3">
+              <label for="photo" class="form-label">Hostel Photos</label>
+              <input type="file" class="form-control" name="hostelPhotos" multiple>
+            </div>
+            <div class="mb-3">
+              <label for="totalFloors" class="form-label">Total Number of Floors</label>
+              <input type="number" class="form-control" name="totalFloors" value="${hostelDetails.totalFloors}" required>
+            </div>
+            <div class="mb-3">
+              <label for="roomsPerFloor" class="form-label">Number of Rooms on each Floor</label>
+              <input type="number" class="form-control" name="roomsPerFloor" value="${hostelDetails.roomsPerFloor}" required>
+            </div>
+            <div class="mb-3">
+              <label for="occupancyPerRoom" class="form-label">Number of occupancy in each room</label>
+              <input type="number" class="form-control" name="occupancyPerRoom" value="${hostelDetails.occupancyPerRoom}" required>
+            </div>
+            <div class="mb-3">
+              <label for="hostelAddress" class="form-label">Hostel Address</label>
+              <input type="text" class="form-control" name="hostelAddress" value="${hostelDetails.hostelAddress}" required>
+            </div>
+            <div class="mb-3">
+              <label for="rulesAndRegulations" class="form-label">Hostel Rules and Regulations</label>
+              <textarea class="form-control" rows="4" name="rulesAndRegulations" required>${hostelDetails.rulesAndRegulations}</textarea>
+            </div>
+            <div class="mb-3">
+              <label for="hostelType" class="form-label">Type of Hostel</label><br>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="hostelType" value="male" required ${
+                  hostelDetails.hostelType === 'male' ? 'checked' : ''
+                }>
+                <label class="form-check-label" for="maleHostel">Male</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="hostelType" value="female" required ${
+                  hostelDetails.hostelType === 'female' ? 'checked' : ''
+                }>
+                <label class="form-check-label" for="femaleHostel">Female</label>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="status" class="form-label">Hostel Status</label><br>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="status" value="true" required ${
+                  hostelDetails.status === 'true' ? 'checked' : ''
+                }>
+                <label class="form-check-label" for="true">True</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="status" value="false" required ${
+                  hostelDetails.status === 'false' ? 'checked' : ''
+                }>
+                <label class="form-check-label" for="false">False</label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </form>
+        </div>
+      `;
+
+      // Set the innerHTML of the editFormContainer
+      editFormContainer.innerHTML = editFormHtml;
+
+      // Show the edit form container
+      editFormContainer.style.display = 'block';
+    }
+  }
+</script>
+
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <title>Document</title>
+  <%- include('./nav.ejs') %>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10 text-center">
+        <h1>Add Hostel</h1>
+        <hr class="my-4 border-4"> <!-- Use 'border-4' to make the line thicker -->
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <form action="/hostel/api/create/" method="post" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="wardenName" class="form-label">Hostel Name</label>
+        <input type="text" class="form-control" name="hostelName" required>
+      </div>
+      <div class="mb-3">
+        <label for="photo" class="form-label">Hostel Photos</label>
+        <input type="file" class="form-control" name="hostelPhotos" multiple required>
+      </div>
+      <div class="mb-3">
+        <label for="mobile" class="form-label">Total Number of Floors</label>
+        <input type="number" class="form-control" name="totalFloors" required>
+      </div>
+      <div class="mb-3">
+        <label for="mobile" class="form-label">Number of Rooms on each Floor</label>
+        <input type="number" class="form-control" name="roomsPerFloor" required>
+      </div>
+      <div class="mb-3">
+        <label for="mobile" class="form-label">Number of occupancy in each room</label>
+        <input type="number" class="form-control" name="occupancyPerRoom" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Hostel Address</label>
+        <input type="text" class="form-control" name="hostelAddress" required>
+      </div>
+      <div class="mb-3">
+        <label for="additionalInfo" class="form-label">Hostel Rules and Regulations</label>
+        <textarea class="form-control" rows="4" name="rulesAndRegulations" required></textarea>
+      </div>
+      <div class="mb-3">
+        <label for="hostelType" class="form-label">Type of Hostel</label><br>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="hostelType" value="male" required>
+          <label class="form-check-label" for="maleHostel">Male</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="hostelType" value="female" required>
+          <label class="form-check-label" for="femaleHostel">Female</label>
+        </div>
+        <input type="hidden" name="token" value="<%= token %>">
+      </div>
+      <button type="submit" class="btn btn-primary mb-5">Submit</button>
+    </form>
+  </div>
+</body>
+
+</html>

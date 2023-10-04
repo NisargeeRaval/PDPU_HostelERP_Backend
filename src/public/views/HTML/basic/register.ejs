@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Register</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/views/CSS/basic/register.css">
+</head>
+
+<body>
+  <div id="loading-container" style="display: none;">
+    <object data="/views/utilities/loading.ejs"></object>
+  </div>
+  <div class="main-container" id="main-content">
+    <div class="container">
+      <div class="image-container">
+        <img src="/views/Images/logo.png">
+        <h3>Pandit Deendayal Energy University</h3>
+      </div>
+      <form action="/user/api/register" method="post">
+        <div class="register-main">
+          <div>
+            <label for="email">Email</label>&emsp;&emsp;&nbsp;
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div>
+            <label for="firstname">First Name</label>&emsp;&emsp;
+            <input type="text" id="firstname" name="firstname" required>
+          </div>
+          <div>
+            <label for="lastname">Last Name</label>&emsp;&emsp;
+            <input type="text" id="lastname" name="lastname" required>
+          </div>
+          <div>
+            <label for="rollno">Roll No</label>&emsp;&emsp;
+            <input type="text" id="rollno" name="rollno" required>
+          </div>
+          <div>
+            <label for="mobileno">Mobile No</label>&emsp;&emsp;
+            <input type="tel" id="mobileno" name="mobileno" required>
+          </div>
+          <div>
+            <label for="parentsmobile">Parent's Mobile No</label>&emsp;&emsp;
+            <input type="tel" id="parentsmobile" name="parentsmobile" required>
+          </div>
+          <div>
+            <label for="address">Address</label>&emsp;&emsp;
+            <input type="text" id="address" name="address" required>
+          </div>
+          <div>
+            <label for="password">Password</label>&emsp;&emsp;
+            <input type="password" id="password" name="password" required>
+          </div>
+          <a href="/user/login">Login</a>
+          <button class="btn" id="registerBtn" type="submit">Register</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

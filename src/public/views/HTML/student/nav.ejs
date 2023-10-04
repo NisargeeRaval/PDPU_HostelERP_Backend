@@ -1,0 +1,53 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+  <a class="navbar-brand" href="#">Hostel ERP User</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="#">Dashboard</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="hostelManagementDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Hostel Management
+        </a>
+        <div class="dropdown-menu" aria-labelledby="hostelManagementDropdown">
+          <a class="dropdown-item" href="#">Add Hostel</a>
+          <a class="dropdown-item" href="#">Edit Hostel</a>
+          <a class="dropdown-item" href="#">Delete Hostel</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="studentManagementDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Student Management
+        </a>
+        <div class="dropdown-menu" aria-labelledby="studentManagementDropdown">
+          <a class="dropdown-item" href="#">Add Student</a>
+          <a class="dropdown-item" href="#">Edit Student</a>
+          <a class="dropdown-item" href="#">Delete Student</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="wardenManagementDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Warden Management
+        </a>
+        <div class="dropdown-menu" aria-labelledby="wardenManagementDropdown">
+          <a class="dropdown-item" href="#">Add Warden</a>
+          <a class="dropdown-item" href="#">Edit Warden</a>
+          <a class="dropdown-item" href="#">Delete Warden</a>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" id="logoutButton" onclick="logout()">Logout</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<script>
+  function logout() {
+    localStorage.removeItem(token);
+    window.location.replace('/user/login');
+  }
+</script>

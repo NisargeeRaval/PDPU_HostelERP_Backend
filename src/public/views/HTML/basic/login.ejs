@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Login</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/views/CSS/basic/login.css">
+</head>
+
+<body>
+  <div id="loading-container" style="display: none;">
+    <object data="/views/utilities/loading.ejs"></object>
+  </div>
+  <div class="main-container" id="main-content">
+    <div class="container">
+      <div class="image-container">
+        <img src="/views/Images/logo.png">
+        <h3>Pandit Deendayal Energy University</h3>
+      </div>
+      <form action="/user/api/login" method="post">
+        <div class="login-main">
+          <div>
+            <label for="email">Email</label>&emsp;&emsp;
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div>
+            <label for="password">Password</label>&emsp;&emsp;&nbsp;
+            <input type="password" id="password" name="password" required>
+          </div>
+          <div class="links">
+            <a href="">Forget Password</a>
+            <a href="/user/register">Register</a>
+          </div>
+          <button class="btn" type="submit">Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>

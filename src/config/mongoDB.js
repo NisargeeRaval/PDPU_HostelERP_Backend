@@ -3,18 +3,13 @@ require('dotenv').config();
 
 mongoose.set("strictQuery", true);
 
-// Connect to DB
-mongoose.connect(process.env.DATABASE_URL);
+const connectToDatabase = async () => {
+    try {
+        await mongoose.connect(process.env.DATABASE_URL);
+        console.log("DB: Connected");
+    } catch (error) {
+        console.error("DB: Error", error);
+    }
+};
 
-// Event handlers for database connection
-const db = mongoose.connection;
-
-db.on("error", (error) => {
-    console.error("DB : Error", error);
-});
-
-db.once("open", () => {
-    console.log("DB : Connected");
-});
-
-module.exports = mongoose;
+module.exports = connectToDatabase;

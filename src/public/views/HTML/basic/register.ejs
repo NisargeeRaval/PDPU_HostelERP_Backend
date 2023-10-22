@@ -20,7 +20,7 @@
         <img src="/views/Images/logo.png">
         <h3>Pandit Deendayal Energy University</h3>
       </div>
-      <form action="/user/api/register" method="post">
+      <form action="/user/api/register" method="post" enctype="multipart/form-data">
         <div class="register-main">
           <div>
             <label for="email">Email</label>&emsp;&emsp;&nbsp;
@@ -53,6 +53,10 @@
           <div>
             <label for="password">Password</label>&emsp;&emsp;
             <input type="password" id="password" name="password" required>
+          </div>
+          <div>
+            <label for="proof">Proof of Admission</label>&emsp;&emsp;
+            <input type="file" id="proof" name="studentPhotos" multiple required>
           </div>
           <a href="/user/login">Login</a>
           <button class="btn" id="registerBtn" type="submit">Register</button>

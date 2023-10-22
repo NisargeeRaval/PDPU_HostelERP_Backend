@@ -5,23 +5,18 @@ module.exports = async (req, res, next) => {
     try {
         // Check if the token is provided in the request headers
         const tokenFromHeaders = req.headers.authorization;
-        console.log('header token = ' + tokenFromHeaders);
 
         // Check if the token is provided in the URL query parameters
         const tokenFromQuery = req.query.token;
-        console.log('query token = ' + tokenFromQuery);
 
         // Check if the token is provided in the request body (form input)
         const tokenFromBody = req.body.token;
-        console.log('body token = ' + tokenFromBody);
 
         // Combine tokens from all sources, removing undefined or empty values
         const allTokens = [tokenFromHeaders, tokenFromQuery, tokenFromBody].filter(Boolean);
 
         // Use the first non-empty token found, or undefined if none were provided
         const token = allTokens[0];
-
-        console.log('final token = ' + token);
 
         if (!token) {
             const headingMessage = "Forbidden. Cannot access resource!";
@@ -32,8 +27,6 @@ module.exports = async (req, res, next) => {
 
         // Verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-        console.log(decoded);
 
         // Attach the decoded token payload to the request object
         req.user = decoded;

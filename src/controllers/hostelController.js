@@ -53,7 +53,7 @@ module.exports = class Admin {
     async update_hostel(req, res) {
         try {
             const hostelId = req.query.id; // Assuming you pass the hostel ID in the URL
-            console.log(hostelId);
+            
             const {
                 hostelName,
                 totalFloors,

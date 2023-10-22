@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const mongoose = require('./src/config/mongoDB');
+const connectToDatabase = require('./src/config/mongoDB');
 const logApi = require('./src/middleware/logAPIMiddleware');
 require('dotenv').config();
 const path = require('path');
@@ -27,12 +27,17 @@ app.use(logApi);
 const userRoutes = require('./src/routes/userRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const hostelRoutes = require('./src/routes/hostelRoutes');
+const wardenRoutes = require('./src/routes/wardenRoutes');
 
 // Your routes go here
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/hostel', hostelRoutes);
+app.use('/warden', wardenRoutes);
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server is listening on port ${process.env.PORT}`);
+// Connect to MongoDB and then start the server
+connectToDatabase().then(() => {
+    app.listen(process.env.PORT, () => {
+        console.log(`Server is listening on port ${process.env.PORT}`);
+    });
 });

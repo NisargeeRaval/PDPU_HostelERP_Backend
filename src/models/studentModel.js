@@ -9,7 +9,9 @@ const studentSchema = new mongoose.Schema({
     rollno: { type: String, required: true },
     mobileno: { type: String, required: true },
     parentsmobile: { type: String, required: true },
-    address: { type: String, required: true }
+    address: { type: String, required: true },
+    status: { type: String, enum: ['true', 'false', 'passout'], default: false },
+    proof: [{ type: String }]
 });
 
 // Create the model

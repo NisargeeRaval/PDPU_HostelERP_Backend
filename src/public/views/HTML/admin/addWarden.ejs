@@ -19,90 +19,39 @@
       </div>
     </div>
   </div>
-  <div class="container">
-    <form>
+  <div class="container mb-5">
+    <form action="/warden/api/register" method="post" enctype="multipart/form-data">
       <div class="mb-3">
         <label for="wardenName" class="form-label">Warden Name</label>
-        <input type="text" class="form-control" id="wardenName">
+        <input type="text" class="form-control" name="wardenName" required>
       </div>
       <div class="mb-3">
         <label for="photo" class="form-label">Photo</label>
-        <input type="file" class="form-control" id="photo">
+        <input type="file" class="form-control" name="wardenPhoto" required>
       </div>
       <div class="mb-3">
         <label for="hostels" class="form-label">Hostels</label>
-        <select class="form-select" id="hostels">
-          <option selected>Select Hostel</option>
-          <option>Hostel 1</option>
-          <option>Hostel 2</option>
-          <option>Hostel 3</option>
+        <select class="form-select" name="hostel" required>
+          <!-- <option selected>Select Hostel</option> -->
+          <% hostel.forEach(function(hostel) { %>
+          <option value="<%= hostel._id %>"><%= hostel.hostelName %></option>
+          <% }); %>
         </select>
       </div>
       <div class="mb-3">
         <label for="mobile" class="form-label">Mobile Number</label>
-        <input type="text" class="form-control" id="mobile">
+        <input type="text" class="form-control" name="mobile" required>
       </div>
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" id="email">
+        <input type="email" class="form-control" name="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" name="password" required>
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-  </div>
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-10 text-center">
-        <h1>View Warden Profile</h1>
-        <hr class="my-4 border-4"> <!-- Use 'border-4' to make the line thicker -->
-      </div>
-    </div>
-  </div>
-  <div class="container">
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Warden Name</th>
-          <th>Photo</th>
-          <th>Hostels</th>
-          <th>Mobile Number</th>
-          <th>Email</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Warden 1</td>
-          <td><img src="https://via.placeholder.com/150" alt="Warden 1" class="img-fluid"></td>
-          <td>Hostel 1</td>
-          <td>Mobile 1</td>
-          <td>Email 1</td>
-          <td>
-            <button type="button" class="btn btn-warning">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button type="button" class="btn btn-danger">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td>Warden 2</td>
-          <td><img src="https://via.placeholder.com/150" alt="Warden 2" class="img-fluid"></td>
-          <td>Hostel 2</td>
-          <td>Mobile 2</td>
-          <td>Email 2</td>
-          <td>
-            <button type="button" class="btn btn-warning">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button type="button" class="btn btn-danger">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-        <!-- Add more rows for other wardens -->
-      </tbody>
-    </table>
   </div>
 </body>
 

@@ -1,5 +1,6 @@
 const student_model = require('../models/studentModel');
 const admin_model = require('../models/adminModel');
+const warden_model = require('../models/wardenModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
@@ -24,37 +25,45 @@ module.exports = class Basic {
 
             const { email, password } = req.body;
 
-            // Find user by email
-            const student = await student_model.findOne({ email });
-
+            const student = await student_model.findOne({
+                $or: [{ email: email }, { mobileno: email }]
+            });
             if (student) {
-                // Compare passwords
+                const isApproved = student.status;
+
+                if (isApproved == 'false') {
+                    const headingMessage = "Wait for admin approval!";
+                    const paragraphMessage = "We have sent your request to admin! Try login after sometime.";
+                    const newRoute = '/user/login';
+                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                }
+
                 const isPasswordValid = await bcrypt.compare(password, student.password);
                 if (!isPasswordValid) {
                     const headingMessage = "Error while login!";
                     const paragraphMessage = "Incorrect Password. Try to login with correct password or change password!";
                     const newRoute = '/user/login';
-                    res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
-                // Generate JWT
-                const token = jwt.sign({ studentId: student._id, role: student.role }, process.env.JWT_SECRET_KEY);
+                const token = jwt.sign({ userId: student._id, role: 'student' }, process.env.JWT_SECRET_KEY);
 
-                res.render('HTML/student/studentHome', { token: token });
+                return res.render('HTML/student/studentHome', { token: token });
             }
 
-            const admin = await admin_model.findOne({ email });
+            const admin = await admin_model.findOne({
+                $or: [{ email: email }, { phone: email }]
+            });
+            console.log(admin);
             if (admin) {
-                // Compare passwords
                 const isPasswordValid = await bcrypt.compare(password, admin.password);
                 if (!isPasswordValid) {
                     const headingMessage = "Error while login!";
                     const paragraphMessage = "Incorrect Password. Try to login with correct password or change password!";
                     const newRoute = '/user/login';
-                    res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
-                // Generate JWT
                 const token = jwt.sign({ userId: admin._id, role: 'admin' }, process.env.JWT_SECRET_KEY);
 
                 const userData = {
@@ -63,20 +72,45 @@ module.exports = class Basic {
                     role: 'admin'
                 }
 
-                res.render('HTML/admin/adminHome', { token: token, userData: userData });
+                return res.render('HTML/admin/adminHome', { token: token, userData: userData });
             }
 
-            if (!student && !admin) {
+            const warden = await warden_model.findOne({
+                $or: [{ email: email }, { mobile: email }]
+            });
+            if (warden) {
+                const status = warden.status;
+                if (status == 'false') {
+                    const headingMessage = "Can not login!";
+                    const paragraphMessage = "Your crediential are blocked by admin! Try to contact admin.";
+                    const newRoute = '/user/login';
+                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                }
+
+                const isPasswordValid = await bcrypt.compare(password, warden.password);
+                if (!isPasswordValid) {
+                    const headingMessage = "Error while login!";
+                    const paragraphMessage = "Incorrect Password. Try to login with correct password or change password!";
+                    const newRoute = '/user/login';
+                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                }
+
+                const token = jwt.sign({ userId: warden._id, role: 'warden' }, process.env.JWT_SECRET_KEY);
+
+                return res.render('HTML/warden/wardenHome', { token: token });
+            }
+
+            if (!student && !admin && !warden) {
                 const headingMessage = "Error while login!";
                 const paragraphMessage = "User does not exists. Try to Register!";
                 const newRoute = '/user/register';
-                res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
             }
         } catch (error) {
             const headingMessage = "Something went Wrong";
             const paragraphMessage = "Error while login. Try to login again!";
             const newRoute = '/user/login';
-            res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 
@@ -110,7 +144,8 @@ module.exports = class Basic {
                 rollno,
                 mobileno,
                 parentsmobile,
-                address
+                address,
+                proof: req.files.map((file) => file.filename)
             });
 
             const mailOptions = {

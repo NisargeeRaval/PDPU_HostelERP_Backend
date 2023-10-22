@@ -110,7 +110,7 @@ label {
     font-size: larger;
 }
 
-#email, #firstname, #lastname, #rollno, #mobileno, #parentsmobile, #address, #password {
+#email, #firstname, #lastname, #rollno, #mobileno, #parentsmobile, #address, #password, #proof {
     outline: none;
     border: none;
     border-radius: 5px;
@@ -123,7 +123,7 @@ label {
     border-bottom-right-radius: 0%;
 }
 
-#email:focus, #firstname:focus, #lastname:focus, #rollno:focus, #mobileno:focus, #parentsmobile:focus, #address:focus, #password:focus {
+#email:focus, #firstname:focus, #lastname:focus, #rollno:focus, #mobileno:focus, #parentsmobile:focus, #address:focus, #password:focus, #proof:focus {
     border-bottom: 2px solid #ff8600;
 }
 

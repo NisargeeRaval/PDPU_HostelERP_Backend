@@ -6,18 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hostel ERP Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-</head>
-
-<body>
-  <%- include('./nav.ejs') %>
   <script>
     // Check if the token is defined and not an empty string
     const token = '<%= typeof token !== "undefined" && token !== "" ? token : "" %>';
     const userData = '<%= typeof userData !== "undefined" ? JSON.stringify(userData) : "{}" %>';
 
-    const userData1 = JSON.parse('<%- unescape(JSON.stringify(userData)) %>');
-
     if (token && userData) {
+      const userData1 = JSON.parse('<%- unescape(JSON.stringify(userData)) %>');
       localStorage.setItem('token', token);
       localStorage.setItem('userData', JSON.stringify(userData1));
     }
@@ -26,8 +21,118 @@
     window.token = token;
     window.userData = userData;
   </script>
+  <style>
+    /* Define custom scroll bar styles */
+    ::-webkit-scrollbar {
+      width: 50px;
+      /* Width of the entire scroll bar */
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      /* Color of the scroll bar track */
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      /* Color of the scroll thumb */
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+      /* Color of the scroll thumb on hover */
+    }
+  </style>
+</head>
+
+<body>
+  <%- include('./nav.ejs') %>
+
+  <div class="container mt-4">
+    <div class="table-responsive overflow-auto" style="max-height: 400px;">
+      <div class="container mt-4">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th class="bg-primary text-white">Hostel</th>
+                <th>Attribute 1</th>
+                <th>Attribute 2</th>
+                <th>Attribute 3</th>
+                <th>Attribute 4</th>
+                <th>Attribute 5</th>
+                <th>Attribute 6</th>
+                <th>Attribute 7</th>
+                <th>Attribute 8</th>
+                <th>Attribute 9</th>
+                <th>Attribute 10</th>
+                <th>Attribute 11</th>
+                <th>Attribute 12</th>
+                <th>Attribute 13</th>
+                <th>Attribute 14</th>
+                <th>Attribute 15</th>
+                <th>Attribute 16</th>
+                <th>Attribute 17</th>
+                <th>Attribute 18</th>
+                <th>Attribute 19</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="2" class="bg-primary text-white">Hostel 1</td>
+                <td>Data 1</td>
+                <td>Data 2</td>
+                <td>Data 3</td>
+                <td>Data 4</td>
+                <td>Data 5</td>
+                <td>Data 6</td>
+                <td>Data 7</td>
+                <td>Data 8</td>
+                <td>Data 9</td>
+                <td>Data 10</td>
+                <td>Data 10</td>
+                <td>Data 10</td>
+                <td>Data 10</td>
+                <td>Data 10</td>
+                <td>Data 10</td>
+                <td>Data 10</td>
+                <td>Data 10</td>
+                <td>Data 10</td>
+                <td>Data 10</td>
+              </tr>
+              <tr>
+                <td>Data 11</td>
+                <td>Data 12</td>
+                <td>Data 13</td>
+                <td>Data 14</td>
+                <td>Data 15</td>
+                <td>Data 16</td>
+                <td>Data 17</td>
+                <td>Data 18</td>
+                <td>Data 19</td>
+                <td>Data 20</td>
+              </tr>
+              <tr>
+                <td class="bg-primary text-white">Hostel 2</td>
+                <td class="bg-light">Data 21</td>
+                <td>Data 22</td>
+                <td>Data 23</td>
+                <td>Data 24</td>
+                <td>Data 25</td>
+                <td>Data 26</td>
+                <td>Data 27</td>
+                <td>Data 28</td>
+                <td>Data 29</td>
+                <td>Data 30</td>
+              </tr>
+              <!-- Add more hostels and data here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
-
 
 </html>

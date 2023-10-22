@@ -1,14 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const user_controller = require("../controllers/userController");
+const WardenClass = new (require('../controllers/wardenController'))();
 const multer = require('multer');
 const path = require('path');
 
-const UserClass = new user_controller();
-
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '..', 'public', 'images', 'student')); // Set the destination folder for uploaded files
+        cb(null, path.join(__dirname, '..', 'public', 'images', 'warden')); // Set the destination folder for uploaded files
     },
     filename: function (req, file, cb) {
         cb(null, (Date.now() + file.originalname).replace(/\s+/g, "")); // Set a unique filename for the uploaded file
@@ -29,9 +27,9 @@ const upload = multer({
     }
 });
 
-router.get("/login", (req, res) => UserClass.load_login_page(req, res))
-router.post("/api/login", (req, res) => UserClass.login(req, res));
-router.get("/register", (req, res) => UserClass.load_register_page(req, res));
-router.post("/api/register", upload.array("studentPhotos"), (req, res) => UserClass.register(req, res));
+router.get("/add", (req, res) => WardenClass.load_add_warden_page(req, res));
+router.get("/view", (req, res) => WardenClass.load_view_warden_page(req, res));
+router.post("/api/register", upload.single("wardenPhoto"), (req, res) => WardenClass.register_warden(req, res));
+router.post("/api/update", upload.single("wardenPhoto"), (req, res) => WardenClass.update_warden(req, res));
 
 module.exports = router;

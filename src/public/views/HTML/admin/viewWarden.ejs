@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <title>Document</title>
+  <%- include('./nav.ejs') %>
+</head>
+
+<body>
+  <div id="editFormContainer" style="display: none;">
+    <!-- Edit form will be dynamically generated here -->
+  </div>
+
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10 text-center">
+        <h1>View Wardens</h1>
+        <hr class="my-4 border-4"> <!-- Use 'border-4' to make the line thicker -->
+      </div>
+    </div>
+  </div>
+  <div class="container mb-5">
+    <% if (Array.isArray(warden) && warden.length === 0) { %>
+    <div class="container">
+      <div class="alert alert-info custom-alert" role="alert">
+        No warden found! Try to add new warden.
+      </div>
+    </div>
+    <% } else {%>
+    <table class="table table-bordered mb-4">
+      <thead>
+        <tr>
+          <th>Warden Name</th>
+          <th>Photo</th>
+          <th>Hostels</th>
+          <th>Mobile Number</th>
+          <th>Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% warden.forEach(function(warden) { %>
+        <tr data-warden='<%- JSON.stringify(warden) %>'>
+          <td><%= warden.wardenName %></td>
+          <td>
+            <img src="<%= warden.wardenPhoto %>" alt="<%= warden.wardenPhoto %>" class="img-thumbnail" style="width: 100px; height: 100px;">
+          </td>
+          <td><%= warden.hostelName %></td>
+          <td><%= warden.mobile %></td>
+          <td><%= warden.email %></td>
+          <td>
+            <button type="button" class="btn btn-warning" id="<%= warden._id %>" onclick="showEditForm(this)">
+              <i class="fas fa-edit"></i>
+            </button>
+          </td>
+        </tr>
+        <% });} %>
+      </tbody>
+    </table>
+  </div>
+</body>
+
+<script>
+  function showEditForm(button) {
+    const editFormContainer = document.getElementById('editFormContainer');
+    const rowData = button.closest('tr').getAttribute('data-warden');
+    const wardenDetails = JSON.parse(rowData);
+
+    if (wardenDetails) {
+      const editFormHtml = `<div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10 text-center">
+        <h1>Update Warden Profile</h1>
+        <hr class="my-4 border-4"> <!-- Use 'border-4' to make the line thicker -->
+      </div>
+    </div>
+  </div>
+  <div class="container mb-5">
+    <form action="/warden/api/update/?id=${wardenDetails._id}" method="post" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="wardenName" class="form-label">Warden Name</label>
+        <input type="text" class="form-control" name="wardenName" value="${wardenDetails.wardenName}" required>
+      </div>
+      <div class="mb-3">
+        <label for="photo" class="form-label">Photo</label>
+        <input type="file" class="form-control" name="wardenPhoto">
+      </div>
+      <div class="mb-3">
+        <label for="hostels" class="form-label">Hostels</label>
+        <select class="form-select" name="hostel" required>
+          <% hostel.forEach(function(hostel) { %>
+          <option value="<%= hostel._id %>"><%= hostel.hostelName %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="mobile" class="form-label">Mobile Number</label>
+        <input type="text" class="form-control" name="mobile" value="${wardenDetails.mobile}" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" value="${wardenDetails.email}" required>
+      </div>
+      <div class="mb-3">
+              <label for="status" class="form-label">Hostel Status</label><br>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="status" value="true" required ${
+                  wardenDetails.status === 'true' ? 'checked' : ''
+                }>
+                <label class="form-check-label" for="true">True</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="status" value="false" required ${
+                    wardenDetails.status === 'false' ? 'checked' : ''
+                }>
+                <label class="form-check-label" for="false">False</label>
+              </div>
+            </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>`;
+      // Set the innerHTML of the editFormContainer
+      editFormContainer.innerHTML = editFormHtml;
+
+      // Show the edit form container
+      editFormContainer.style.display = 'block';
+      setOptionValue(wardenDetails);
+    }
+  }
+
+  function setOptionValue(wardenDetails) {
+    // Set the selected hostel based on wardenDetails.hostelName
+    const selectElement = editFormContainer.querySelector('select[name="hostel"]');
+    const hostelOptions = selectElement.querySelectorAll('option');
+    hostelOptions.forEach(option => {
+      if (option.text === wardenDetails.hostelName) { // Use wardenDetails.hostel here
+        option.selected = true;
+      }
+    });
+  }
+</script>
+
+</html>

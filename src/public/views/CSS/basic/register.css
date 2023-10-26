@@ -110,7 +110,7 @@ label {
     font-size: larger;
 }
 
-#email, #firstname, #lastname, #rollno, #mobileno, #parentsmobile, #address, #password, #proof {
+#email, #firstname, #lastname, #rollno, #mobileno, #parentsmobile, #address, #password, #proof, #parentsname, #parentsemail {
     outline: none;
     border: none;
     border-radius: 5px;

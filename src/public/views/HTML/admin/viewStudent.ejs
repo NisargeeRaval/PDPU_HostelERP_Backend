@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <title>Student Search</title>
+  <%- include('./nav.ejs') %>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Student Search</h1>
+    <!-- Search Bar -->
+    <form id="searchForm" onsubmit="searchStudents(); return false;">
+      <div class="row mt-3">
+        <div class="col-md-6 offset-md-3">
+          <div class="input-group">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search by Email, Name, Roll No, Mobile, etc." required>
+            <button type="submit" class="btn btn-primary">Search</button>
+          </div>
+        </div>
+      </div>
+    </form>
+    <!-- Search Results -->
+    <div class="row mt-4" id="searchResults">
+      <!-- Search results will be displayed here -->
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-R0G6pqVhY5H0f2un3ibFKK5F0qtAp9oFFH0d1vjoUOFQgptvR3Yb9pf22ZnCFT33" crossorigin="anonymous"></script>
+  <script>
+    async function searchStudents() {
+      const searchInput = document.getElementById('searchInput');
+      const searchQuery = searchInput.value; // Store the search query
+      searchInput.value = ''; // Clear the input field
+
+      const response = await fetch(`/admin/api/searchStudent/?searchData=${searchQuery}`, {
+        method: 'GET'
+      });
+
+      if (response.ok) {
+        try {
+          const students = await response.json(); // Await the JSON response here
+
+          const searchResults = document.getElementById('searchResults');
+
+          // Clear previous search results
+          searchResults.innerHTML = '';
+
+          if (students.length == 0) {
+            // Create the alert element
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-info custom-alert';
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.textContent = 'The search result does not match any result! Try searching valid data like roll number, mobile number';
+
+            // Get the "searchResults" div
+            const searchResultsDiv = document.getElementById('searchResults');
+
+            // Append the alert element to the "searchResults" div
+            searchResultsDiv.appendChild(alertDiv);
+          }
+
+          students.forEach(student => {
+            // Create the elements
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-md-4 mb-4';
+
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+
+            const img = document.createElement('img');
+            img.src = student.proof[0];
+            img.className = 'card-img-top';
+            img.alt = `${student.firstname} ${student.lastname}`;
+
+            const cardBodyDiv = document.createElement('div');
+            cardBodyDiv.className = 'card-body';
+
+            const cardTitle = document.createElement('h5');
+            cardTitle.className = 'card-title';
+            cardTitle.textContent = `${student.firstname} ${student.lastname}`;
+
+            const emailText = document.createElement('p');
+            emailText.className = 'card-text';
+            emailText.textContent = `Email: ${student.email}`;
+
+            const rollNoText = document.createElement('p');
+            rollNoText.className = 'card-text';
+            rollNoText.textContent = `Roll No: ${student.rollno}`;
+
+            const mobileNoText = document.createElement('p');
+            mobileNoText.className = 'card-text';
+            mobileNoText.textContent = `Mobile No: ${student.mobileno}`;
+
+            const parentsMobileText = document.createElement('p');
+            parentsMobileText.className = 'card-text';
+            parentsMobileText.textContent = `Parents' Mobile: ${student.parentsmobile}`;
+
+            const addressText = document.createElement('p');
+            addressText.className = 'card-text';
+            addressText.textContent = `Address: ${student.address}`;
+
+            const statusText = document.createElement('p');
+            statusText.className = 'card-text';
+            statusText.textContent = `Status: ${student.status}`;
+
+            // Append elements to build the DOM structure
+            cardBodyDiv.appendChild(cardTitle);
+            cardBodyDiv.appendChild(emailText);
+            cardBodyDiv.appendChild(rollNoText);
+            cardBodyDiv.appendChild(mobileNoText);
+            cardBodyDiv.appendChild(parentsMobileText);
+            cardBodyDiv.appendChild(addressText);
+            cardBodyDiv.appendChild(statusText);
+
+            cardDiv.appendChild(img);
+            cardDiv.appendChild(cardBodyDiv);
+
+            colDiv.appendChild(cardDiv);
+
+            // Append the colDiv to the searchResults container
+            searchResults.appendChild(colDiv);
+          });
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+        }
+      } else {
+        console.error('Error response from the server');
+      }
+    }
+  </script>
+</body>
+
+</html>

@@ -8,17 +8,24 @@ module.exports = class Admin {
 
             const hostelData = await hostel_model.find({});
 
-            res.render('HTML/admin/viewHostel.ejs', { hostelData: hostelData, token: token });
+            return res.render('HTML/admin/viewHostel.ejs', { hostelData: hostelData, token: token });
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Please Try to reload the page!";
             const newRoute = '/hostel/viewHostel';
-            res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 
     async load_add_hostel__page(req, res) {
-        res.render('HTML/admin/addHostel.ejs');
+        try {
+            return res.render('HTML/admin/addHostel.ejs');
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while fetching data. Reload the page again!";
+            const newRoute = '/admin/dashboard';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
     }
 
     async add_hostel(req, res) {
@@ -41,12 +48,12 @@ module.exports = class Admin {
             const headingMessage = "Hostel Succesfully Created!";
             const paragraphMessage = `Click "OK" to view hostel details!`;
             const newRoute = '/hostel/viewHostel';
-            res.render('utilities/responseMessageSuccess.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.render('utilities/responseMessageSuccess.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while creating hostel. Try to create hostel again!";
             const newRoute = '/hostel/createHostel';
-            res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 
@@ -88,7 +95,7 @@ module.exports = class Admin {
             const headingMessage = "Hostel Successfully Updated!";
             const paragraphMessage = `Click "OK" to view the updated hostel details!`;
             const newRoute = '/hostel/viewHostel'; // Redirect to the appropriate route
-            res.render('utilities/responseMessageSuccess.ejs', {
+            return res.render('utilities/responseMessageSuccess.ejs', {
                 headingMessage: headingMessage,
                 paragraphMessage: paragraphMessage,
                 newRoute: newRoute,
@@ -97,7 +104,7 @@ module.exports = class Admin {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while updating hostel. Try again!";
             const newRoute = '/hostel/viewHostel'; // Redirect to the appropriate route
-            res.render('utilities/responseMessageError.ejs', {
+            return res.render('utilities/responseMessageError.ejs', {
                 headingMessage: headingMessage,
                 paragraphMessage: paragraphMessage,
                 newRoute: newRoute,

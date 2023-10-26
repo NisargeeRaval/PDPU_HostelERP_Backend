@@ -8,10 +8,14 @@ const studentSchema = new mongoose.Schema({
     lastname: { type: String, required: true },
     rollno: { type: String, required: true },
     mobileno: { type: String, required: true },
+    parentsname: { type: String, required: true },
+    parentsemail: { type: String, required: true },
     parentsmobile: { type: String, required: true },
     address: { type: String, required: true },
-    status: { type: String, enum: ['true', 'false', 'passout'], default: false },
-    proof: [{ type: String }]
+    status: { type: String, enum: ['true', 'false', 'passout', 'block'], default: false },
+    proof: [{ type: String }],
+    enrolled: { type: String, enum: ['true', 'false'], default: false },
+    parentsid: { type: mongoose.Schema.Types.ObjectId },
 });
 
 // Create the model

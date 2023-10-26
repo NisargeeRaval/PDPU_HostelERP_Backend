@@ -35,6 +35,11 @@ app.use('/admin', adminRoutes);
 app.use('/hostel', hostelRoutes);
 app.use('/warden', wardenRoutes);
 
+
+app.get('/', (req, res) => {
+    res.render('HTML/roomview');
+})
+
 // Connect to MongoDB and then start the server
 connectToDatabase().then(() => {
     app.listen(process.env.PORT, () => {

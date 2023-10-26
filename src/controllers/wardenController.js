@@ -61,23 +61,23 @@ module.exports = class Warden {
 
     async load_add_warden_page(req, res) {
         try {
-            res.render('HTML/admin/addWarden.ejs', { hostel: this.hostelData, warden: this.wardenData });
+            return res.render('HTML/admin/addWarden.ejs', { hostel: this.hostelData, warden: this.wardenData });
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while loading page. Reload the page again!";
             const newRoute = '/admin/dashboard';
-            res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 
     async load_view_warden_page(req, res) {
         try {
-            res.render('HTML/admin/viewWarden.ejs', { hostel: this.hostelData, warden: this.wardenData });
+            return res.render('HTML/admin/viewWarden.ejs', { hostel: this.hostelData, warden: this.wardenData });
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while loading page. Reload the page again!";
             const newRoute = '/admin/dashboard';
-            res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 
@@ -117,12 +117,12 @@ module.exports = class Warden {
             // Reload the warden data
             await this.loadWardenData();
 
-            res.render('HTML/admin/viewWarden.ejs', { hostel: this.hostelData, warden: this.wardenData });
+            return res.render('HTML/admin/viewWarden.ejs', { hostel: this.hostelData, warden: this.wardenData });
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while registering warden. Register warden again!";
             const newRoute = '/warden/add';
-            res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 
@@ -161,7 +161,7 @@ module.exports = class Warden {
             const headingMessage = "Warden Successfully Updated!";
             const paragraphMessage = `Click "OK" to view the updated warden details!`;
             const newRoute = '/warden/view'; // Redirect to the appropriate route
-            res.render('utilities/responseMessageSuccess.ejs', {
+            return res.render('utilities/responseMessageSuccess.ejs', {
                 headingMessage: headingMessage,
                 paragraphMessage: paragraphMessage,
                 newRoute: newRoute,
@@ -170,7 +170,7 @@ module.exports = class Warden {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while updating warden. Update warden details again!";
             const newRoute = '/warden/view';
-            res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 };

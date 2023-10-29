@@ -11,19 +11,17 @@
 
 <body>
   <div class="container mt-5">
-    <h1 class="text-center">Hostel Layout</h1>
+    <h1 class="text-center"><%= hostelName %> Hostel Layout</h1>
     <div class="d-flex flex-wrap">
       <!-- Loop through floors -->
-      <% for (let floor = 1; floor <= 10; floor++) { %>
-      <!-- Initialize room numbers for each floor -->
-      <% let roomNumber = 1; %>
+      <% for (let floor = 0; floor < hostelLayout.length; floor++) { %>
       <div class="floor-box col-12 d-flex justify-content-between">
         <div class="d-flex align-items-center">
           <div>
-            Floor <%= floor %>
+            Floor <%= hostelLayout[floor].floor %>
           </div>
-          <span class="circle green bg-success">10</span>
-          <span class="circle red bg-danger">10</span>
+          <span class="circle green bg-success"><%= hostelLayout[floor].floorVacantSeats %></span>
+          <span class="circle red bg-danger"><%= hostelLayout[floor].floorFilledSeats %></span>
         </div>
         <div>
           <i class="fa-solid fa-chevron-down fa-2xl toggle-button" style="cursor: pointer;" onclick="toggleDetails(this)"></i>
@@ -32,16 +30,14 @@
       <div class="floor-details collapse" id="floor<%= floor %>">
         <div class="d-flex flex-wrap">
           <!-- Loop through rooms on the current floor -->
-          <% for (let room = 1; room <= 20; room++) { %>
-          <a class="room-box btn btn-light" href="#">
+          <% for (let room = 0; room < hostelLayout[floor].rooms.length; room++) { %>
+          <a class="room-box btn btn-light" href="/hostel/roomDetails?roomID=<%= hostelLayout[floor].rooms[room]._id %>">
             <div class="room-details">
               <!-- Display number of empty beds all the time -->
-              Room <%= floor * 100 + roomNumber % 100 %>
-              <span class="circle blue bg-primary">3</span>
+              Room <%= hostelLayout[floor].rooms[room].roomNumber %>
+              <span class="circle blue bg-primary"><%= hostelLayout[floor].rooms[room].vacencyPerRoom %></span>
             </div>
           </a>
-          <!-- Increment room number for the next room -->
-          <% roomNumber++; %>
           <% } %>
         </div>
       </div>

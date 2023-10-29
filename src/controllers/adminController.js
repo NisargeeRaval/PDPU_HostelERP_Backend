@@ -181,6 +181,8 @@ module.exports = class Admin {
                     }
                 });
 
+                user.status = status
+                await user.save();
             }
 
             if (status == 'true') {

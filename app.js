@@ -28,17 +28,16 @@ const userRoutes = require('./src/routes/userRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const hostelRoutes = require('./src/routes/hostelRoutes');
 const wardenRoutes = require('./src/routes/wardenRoutes');
+const studentRoutes = require('./src/routes/studentRoutes');
+const roomRoutes = require('./src/routes/roomRoutes');
 
 // Your routes go here
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/hostel', hostelRoutes);
 app.use('/warden', wardenRoutes);
-
-
-app.get('/', (req, res) => {
-    res.render('HTML/roomview');
-})
+app.use('/student', studentRoutes);
+app.use('/room', roomRoutes);
 
 // Connect to MongoDB and then start the server
 connectToDatabase().then(() => {

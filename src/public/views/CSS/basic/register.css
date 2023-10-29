@@ -14,8 +14,8 @@ a:visited {
 
 body {
     overflow-x: hidden;
-    background-color:#FAF9F6;
-    font-family: Merriweather,Georgia,serif;
+    background-color: #FAF9F6;
+    font-family: Merriweather, Georgia, serif;
 }
 
 .main-container {
@@ -31,7 +31,8 @@ body {
 
 .container {
     /* margin: 30% 0% 30% 0%; */
-    background-color: #1a1b1b; /* ff8600 */
+    background-color: #1a1b1b;
+    /* ff8600 */
     width: 50%;
     height: auto;
     border-radius: 12px;
@@ -59,7 +60,7 @@ body {
     transform: scale(1.1);
 }
 
-.container img{
+.container img {
     width: 25%;
     height: 15%;
 }
@@ -75,12 +76,12 @@ body {
 
 .register-main div {
     padding-bottom: 3%;
-    color:  white;
+    color: white;
 }
 
 .register-main a {
     padding-bottom: 3%;
-    color:#7a8790;
+    color: #7a8790;
     font-size: larger;
 }
 
@@ -90,7 +91,7 @@ body {
 
 .btn {
     color: #ff8600;
-    background-color:#333434;
+    background-color: #333434;
     padding: 2% 5% 2% 5%;
     font-size: larger;
     font-weight: bolder;
@@ -110,12 +111,23 @@ label {
     font-size: larger;
 }
 
-#email, #firstname, #lastname, #rollno, #mobileno, #parentsmobile, #address, #password, #proof, #parentsname, #parentsemail {
+#email,
+#firstname,
+#lastname,
+#rollno,
+#mobileno,
+#parentsmobile,
+#address,
+#password,
+#proof,
+#parentsname,
+#parentsemail,
+#confirmPassword {
     outline: none;
     border: none;
     border-radius: 5px;
     font-size: larger;
-    color:white;
+    color: white;
     background: transparent;
     border-bottom: 2px solid #7a8790;
     text-indent: 3%;
@@ -123,7 +135,15 @@ label {
     border-bottom-right-radius: 0%;
 }
 
-#email:focus, #firstname:focus, #lastname:focus, #rollno:focus, #mobileno:focus, #parentsmobile:focus, #address:focus, #password:focus, #proof:focus {
+#email:focus,
+#firstname:focus,
+#lastname:focus,
+#rollno:focus,
+#mobileno:focus,
+#parentsmobile:focus,
+#address:focus,
+#password:focus,
+#proof:focus {
     border-bottom: 2px solid #ff8600;
 }
 
@@ -170,6 +190,7 @@ label {
     * {
         font-size: 0.85rem;
     }
+
     .container {
         width: 80%;
         height: auto;
@@ -182,16 +203,16 @@ label {
 
     .image-container img {
 
-        position:relative;
+        position: relative;
         border-top-left-radius: 0%;
         width: 50%;
     }
 
     .register-main div {
-        display:flex;
+        display: flex;
         flex-direction: column;
         padding-bottom: 4%;
-        color:  white;
+        color: white;
     }
 
     a {
@@ -204,7 +225,7 @@ label {
     }
 
     .btn {
-        font-size:x-large;
+        font-size: x-large;
         margin-bottom: 10%;
     }
 }

@@ -9,8 +9,13 @@ const hostelSchema = new mongoose.Schema({
     hostelAddress: { type: String, required: true },
     rulesAndRegulations: { type: String },
     hostelType: { type: String, enum: ['male', 'female'], required: true },
-    status: { type: String, enum: ['true', 'false'], default: false }
-});
+    status: { type: String, enum: ['true', 'false'], default: false },
+    enrollmentActivity: { type: String, enum: ['true', 'false'], default: false }
+},
+    {
+        timestamps: true
+    }
+);
 
 // Create the Hostel model
 const Hostel = mongoose.model('Hostel', hostelSchema);

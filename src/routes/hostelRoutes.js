@@ -33,5 +33,7 @@ router.get("/viewHostel", (req, res) => HostelClass.load_hostel_detail_page(req,
 router.get("/createHostel", (req, res) => HostelClass.load_add_hostel__page(req, res));
 router.post("/api/create", upload.array("hostelPhotos"), (req, res) => HostelClass.add_hostel(req, res));
 router.post("/api/update", upload.array("hostelPhotos"), (req, res) => HostelClass.update_hostel(req, res));
+router.get("/hostelLayout", (req, res) => HostelClass.load_hostel_layout_page(req, res));
+router.get("/roomDetails", (req, res) => HostelClass.load_room_detail_page(req, res));
 
 module.exports = router;

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <title>Student! Book Hostel</title>
+  <%- include('./nav.ejs') %>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Hostel Booking Request</h1>
+    <form action="/room/api/bookHostel" method="POST" id="bookingForm">
+      <div class="mb-3">
+        <label for="wardenName" class="form-label">12 digit user object id of mongodb</label>
+        <input type="text" class="form-control" name="userID" required>
+      </div>
+      <div class="mb-3">
+        <label for="hostelSelect" class="form-label">Select Hostel</label>
+        <select class="form-select" id="hostelSelect" name="hostelSelect">
+          <option value="" disabled selected>Select Hostel</option>
+          <% hostelData.forEach(function(hostel) { %>
+          <option value="<%= hostel.hostel._id %>"><%= hostel.hostel.hostelName %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="mb-3" id="floorSection" style="display: none;">
+        <label for="floorSelect" class="form-label">Select Floor</label>
+        <select class="form-select" id="floorSelect" name="floorSelect">
+          <option value="" disabled selected>Select Floor</option>
+          <!-- Floor options will be populated dynamically using JavaScript -->
+        </select>
+      </div>
+      <div class="mb-3" id="roomSection" style="display: none;">
+        <label for="roomSelect" class="form-label">Select Room</label>
+        <select class="form-select" id="roomSelect" name="roomSelect">
+          <option value="" disabled selected>Select Room</option>
+          <!-- Room options will be populated dynamically using JavaScript -->
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" id="submitButton" style="display: none;">Submit</button>
+    </form>
+  </div>
+
+  <style>
+    .floor-box {
+      border: 1px solid #000;
+      margin: 20px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .circle {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 16px;
+      line-height: 40px;
+      margin-left: 10px;
+    }
+
+    .room-box {
+      margin: 10px;
+      transition: background-color 0.3s, transform 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .room-box:hover {
+      background-color: #f0f0f0;
+      transform: scale(1.1);
+      border: 1px solid #000;
+    }
+  </style>
+
+  <script>
+    // const hostelResult = '<%= hostelData %>';
+    const hostelData = JSON.parse('<%- unescape(JSON.stringify(hostelData)) %>');
+
+    // Function to populate floor options based on selected hostel
+    function populateFloors() {
+      const selectedHostel = document.getElementById('hostelSelect').value;
+      const floorSelect = document.getElementById('floorSelect');
+      floorSelect.innerHTML = '<option value="" disabled selected>Select Floor</option>';
+
+      for (var hostel = 0; hostel < hostelData.length; hostel++) {
+        if (hostelData[hostel].hostel._id == selectedHostel) {
+          for (var floor = 0; floor < hostelData[hostel].floorData.length; floor++) {
+            const option = document.createElement('option');
+            option.value = hostelData[hostel].floorData[floor];
+            option.text = `Floor ${hostelData[hostel].floorData[floor]}`;
+            floorSelect.appendChild(option);
+          }
+        }
+      }
+
+      document.getElementById('floorSection').style.display = 'block';
+    }
+
+    function populateRooms() {
+      const selectedHostel = document.getElementById('hostelSelect').value;
+      const selectedFloor = document.getElementById('floorSelect').value;
+      const roomSelect = document.getElementById('roomSelect');
+      roomSelect.innerHTML = '<option value="" disabled selected>Select Room</option>';
+
+      for (var hostel = 0; hostel < hostelData.length; hostel++) {
+        if (hostelData[hostel].hostel._id == selectedHostel) {
+          for (var room = 0; room < hostelData[hostel].availableRooms.length; room++) {
+            const roomNumber = hostelData[hostel].availableRooms[room].roomNumber;
+            if (selectedFloor == (Math.floor((roomNumber / 100)))) {
+              const option = document.createElement('option');
+              option.value = hostelData[hostel].availableRooms[room]._id;
+              option.text = `Room ${roomNumber}`;
+              roomSelect.appendChild(option);
+            }
+          }
+        }
+      }
+
+      document.getElementById('roomSection').style.display = 'block';
+    }
+
+
+    // Show submit button when all options are selected
+    function showSubmitButton() {
+      document.getElementById('submitButton').style.display = 'block';
+    }
+
+    document.getElementById('hostelSelect').addEventListener('change', populateFloors);
+    document.getElementById('floorSelect').addEventListener('change', populateRooms);
+    document.getElementById('roomSelect').addEventListener('change', showSubmitButton);
+  </script>
+</body>
+
+</html>

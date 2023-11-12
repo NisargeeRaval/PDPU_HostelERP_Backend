@@ -1,7 +1,7 @@
 module.exports = async (req, res, next) => {
     try {
         const token = req.user;
-        if (token.role == 'parent') {
+        if (token.role == 'parents') {
             next();
         } else {
             const headingMessage = "Authentication failed!";

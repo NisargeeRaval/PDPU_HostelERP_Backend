@@ -73,9 +73,10 @@
             cardDiv.className = 'card';
 
             const img = document.createElement('img');
-            img.src = student.proof[0];
+            img.src = student.profile;
             img.className = 'card-img-top';
             img.alt = `${student.firstname} ${student.lastname}`;
+            img.style.maxHeight = '200px';
 
             const cardBodyDiv = document.createElement('div');
             cardBodyDiv.className = 'card-body';

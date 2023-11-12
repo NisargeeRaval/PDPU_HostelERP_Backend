@@ -29,13 +29,19 @@ const upload = multer({
     }
 });
 
+const studentFileUpload = upload.fields([
+    { name: "profile", maxCount: 1 },
+    { name: "proof", maxCount: 10 }
+]);
+
 router.get("/login", (req, res) => UserClass.load_login_page(req, res));
 router.post("/api/login", (req, res) => UserClass.login(req, res));
 router.get("/register", (req, res) => UserClass.load_register_page(req, res));
-router.post("/api/register", upload.array("studentPhotos"), (req, res) => UserClass.register(req, res));
+router.post("/api/register", studentFileUpload, (req, res) => UserClass.register(req, res));
 router.get("/forgetPassword", (req, res) => UserClass.load_forget_password_page(req, res));
 router.post("/api/forgetPassword", (req, res) => UserClass.forget_password(req, res));
 router.get("/resetPassword", (req, res) => UserClass.load_reset_password_page(req, res));
 router.post("/api/resetPassword", (req, res) => UserClass.reset_password(req, res));
+router.get("/api/logout", (req, res) => UserClass.logout(req, res));
 
 module.exports = router;

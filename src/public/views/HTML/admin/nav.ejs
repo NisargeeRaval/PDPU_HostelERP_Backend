@@ -39,16 +39,33 @@
         <li class="nav-item">
           <a class="nav-link" href="#" id="logoutButton" onclick="logout()">Logout</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/profile">Profile</a>
+        </li>
       </ul>
     </div>
   </div>
 </nav>
 
 <script>
-  function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
-    window.location.replace('/user/login');
+  async function logout() {
+    try {
+      const result = await fetch('/user/api/logout', {
+        method: 'GET'
+      });
+
+      if (result.status === 200) {
+        localStorage.removeItem('token');
+        window.location.replace('/user/login');
+      } else {
+        localStorage.removeItem('token');
+        window.location.replace('/user/login');
+      }
+    } catch (error) {
+      const queryString = `?headingMessage=${encodeURIComponent('Something went wrong')}&paragraphMessage=${encodeURIComponent('Error while logout! Please login and logout again.')}&newRoute=${encodeURIComponent('/user/login')}`;
+
+      window.location.href = '/response/error' + queryString;
+    }
   }
 </script>
 

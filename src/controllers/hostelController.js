@@ -124,8 +124,6 @@ module.exports = class Hostel {
             // Use findByIdAndUpdate to update the hostel
             const result = await hostel_model.findByIdAndUpdate(hostelId, updatedHostel, { new: true });
 
-            console.log(result);
-
             const headingMessage = "Hostel Successfully Updated!";
             const paragraphMessage = `Click "OK" to view the updated hostel details!`;
             const newRoute = '/hostel/viewHostel'; // Redirect to the appropriate route
@@ -148,7 +146,11 @@ module.exports = class Hostel {
 
     async load_hostel_layout_page(req, res) {
         try {
-            const hostelID = req.query.hostelID;
+            let hostelID = req.query.hostelID;
+
+            if(req.user.role === 'warden') {
+                hostelID = req.user.hostel;
+            }
 
             const hostel = await hostel_model.findById(hostelID);
 
@@ -181,10 +183,9 @@ module.exports = class Hostel {
                 }
             ]);
 
-            for(var i = 0; i < roomDetails[0].user.length; i++) {
-                for(var j = 0; j < roomDetails[0].user[i].proof.length; j++) {
+            for (var i = 0; i < roomDetails[0].user.length; i++) {
+                for (var j = 0; j < roomDetails[0].user[i].proof.length; j++) {
                     roomDetails[0].user[i].proof[j] = await update_path('student', roomDetails[0].user[i].proof[j]);
-                    console.log(roomDetails[0].user[i].proof[j]);
                 }
             }
 

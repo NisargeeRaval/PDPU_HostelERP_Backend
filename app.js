@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const connectToDatabase = require('./src/config/mongoDB');
 const logApi = require('./src/middleware/logAPIMiddleware');
@@ -11,6 +12,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
+app.use(cookieParser());
 
 // Serve static files from the "public" folder
 app.use(express.static(path.join(__dirname, 'src/public')));
@@ -30,6 +32,7 @@ const hostelRoutes = require('./src/routes/hostelRoutes');
 const wardenRoutes = require('./src/routes/wardenRoutes');
 const studentRoutes = require('./src/routes/studentRoutes');
 const roomRoutes = require('./src/routes/roomRoutes');
+const responseMessageRoutes = require('./src/routes/responseMessageRoutes');
 
 // Your routes go here
 app.use('/user', userRoutes);
@@ -38,6 +41,7 @@ app.use('/hostel', hostelRoutes);
 app.use('/warden', wardenRoutes);
 app.use('/student', studentRoutes);
 app.use('/room', roomRoutes);
+app.use('/response', responseMessageRoutes);
 
 // Connect to MongoDB and then start the server
 connectToDatabase().then(() => {

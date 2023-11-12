@@ -4,7 +4,7 @@ const warden_model = require('../models/wardenModel');
 const parents_model = require('../models/parentsModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const sendEmail = require('../services/sendEmailService');
+const { sendEmail } = require('../services/sendEmailService');
 
 require('dotenv').config();
 
@@ -36,7 +36,7 @@ module.exports = class Basic {
                     const headingMessage = "Wait for admin approval!";
                     const paragraphMessage = "We have sent your request to admin! Try login after sometime.";
                     const newRoute = '/user/login';
-                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                    return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
                 const isPasswordValid = await bcrypt.compare(password, student.password);
@@ -44,12 +44,32 @@ module.exports = class Basic {
                     const headingMessage = "Error while login!";
                     const paragraphMessage = "Incorrect Password. Try to login with correct password or change password!";
                     const newRoute = '/user/login';
-                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                    return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
-                const token = jwt.sign({ userId: student._id, role: 'student' }, process.env.JWT_SECRET_KEY);
+                const payload = {
+                    _id: student._id,
+                    email: student.email,
+                    firstname: student.firstname,
+                    lastname: student.lastname,
+                    rollno: student.rollno,
+                    mobile: student.mobileno,
+                    parentsname: student.parentsname,
+                    parentsemail: student.parentsemail,
+                    parentsmobile: student.parentsmobile,
+                    address: student.address,
+                    parentsid: student.parentsid,
+                    role: 'student'
+                };
 
-                return res.render('HTML/student/studentHome', { token: token });
+                const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
+                const maxAge = 24 * 60 * 60 * 1000;
+
+                res.cookie('token', token, {
+                    maxAge
+                });
+
+                return res.status(200).json({ token: token, role: 'student' });
             }
 
             const admin = await admin_model.findOne({
@@ -61,18 +81,24 @@ module.exports = class Basic {
                     const headingMessage = "Error while login!";
                     const paragraphMessage = "Incorrect Password. Try to login with correct password or change password!";
                     const newRoute = '/user/login';
-                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                    return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
-                const token = jwt.sign({ userId: admin._id, role: 'admin' }, process.env.JWT_SECRET_KEY);
-
-                const userData = {
+                const payload = {
+                    _id: admin._id,
                     email: admin.email,
                     phone: admin.phone,
                     role: 'admin'
-                }
+                };
 
-                return res.render('HTML/admin/adminHome', { token: token, userData: userData });
+                const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
+                const maxAge = 60 * 60 * 1000;
+
+                res.cookie('token', token, {
+                    maxAge
+                });
+
+                return res.status(200).json({ token: token, role: 'admin' });
             }
 
             const warden = await warden_model.findOne({
@@ -84,7 +110,7 @@ module.exports = class Basic {
                     const headingMessage = "Can not login!";
                     const paragraphMessage = "Your crediential are blocked by admin! Try to contact admin.";
                     const newRoute = '/user/login';
-                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                    return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
                 const isPasswordValid = await bcrypt.compare(password, warden.password);
@@ -92,12 +118,26 @@ module.exports = class Basic {
                     const headingMessage = "Error while login!";
                     const paragraphMessage = "Incorrect Password. Try to login with correct password or change password!";
                     const newRoute = '/user/login';
-                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                    return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
-                const token = jwt.sign({ userId: warden._id, role: 'warden' }, process.env.JWT_SECRET_KEY);
+                const payload = {
+                    _id: warden._id,
+                    wardenName: warden.wardenName,
+                    hostel: warden.hostel,
+                    mobile: warden.mobile,
+                    email: warden.email,
+                    role: 'warden'
+                };
 
-                return res.render('HTML/warden/wardenHome', { token: token });
+                const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
+                const maxAge = 3 * 60 * 60 * 1000;
+
+                res.cookie('token', token, {
+                    maxAge
+                });
+
+                return res.status(200).json({ token: token, role: 'warden' });
             }
 
             const parents = await parents_model.findOne({
@@ -109,19 +149,32 @@ module.exports = class Basic {
                     const headingMessage = "Error while login!";
                     const paragraphMessage = "Incorrect Password. Try to login with correct password or change password!";
                     const newRoute = '/user/login';
-                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                    return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
-                const token = jwt.sign({ userId: parents._id, role: 'parents' }, process.env.JWT_SECRET_KEY);
+                const payload = {
+                    _id: parents._id,
+                    mobileno: parents.mobileno,
+                    email: parents.email,
+                    name: parents.name,
+                    role: 'warden'
+                };
 
-                return res.send(token);
+                const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
+                const maxAge = 24 * 60 * 60 * 1000;
+
+                res.cookie('token', token, {
+                    maxAge
+                });
+
+                return res.status(200).json({ token: token, role: 'parents' });
             }
 
             if (!student && !admin && !warden && !parents) {
                 const headingMessage = "Error while login!";
                 const paragraphMessage = "User does not exists. Try to Register!";
                 const newRoute = '/user/register';
-                return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
             }
         } catch (error) {
             const headingMessage = "Something went Wrong";
@@ -172,7 +225,8 @@ module.exports = class Basic {
                 parentsemail,
                 parentsmobile,
                 address,
-                proof: req.files.map((file) => file.filename)
+                proof: req.files.proof.map((file) => file.filename),
+                profile: req.files.profile[0].filename
             });
 
             const subject = 'Welcome to PDPU Hostel ERP System - Await Admin Approval';
@@ -257,7 +311,6 @@ module.exports = class Basic {
             const newRoute = '/user/login';
             return res.render('utilities/responseMessageSuccess.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         } catch (error) {
-            console.log(error);
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while registering. Try to register again!";
             const newRoute = '/user/register';
@@ -342,8 +395,6 @@ module.exports = class Basic {
     }
 
     async sendForgetPasswordLink(email, name) {
-        console.log(email);
-        console.log(name);
         const token = jwt.sign({ email: email, name: name, date: Math.floor(Date.now() / 1000) }, process.env.JWT_SECRET_KEY);
         const resetPasswordLink = `${process.env.SERVER_URL}/user/resetPassword?token=${token}`;
         const subject = 'Password Reset - PDPU Hostel ERP System';
@@ -421,7 +472,7 @@ module.exports = class Basic {
     async load_reset_password_page(req, res) {
         try {
             const token = req.query.token;
-            return res.render('HTML/basic/resetPassword', {token : token});
+            return res.render('HTML/basic/resetPassword', { token: token });
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while fetching data. Reload the page again!";
@@ -524,6 +575,15 @@ module.exports = class Basic {
             const paragraphMessage = "The Password Rest Link is not valid! Try to get new link.";
             const newRoute = '/user/forgetPassword';
             return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async logout(req, res) {
+        try {
+            res.clearCookie('token');
+            res.status(200).json({ success: true }); // Send a JSON response to the client
+        } catch (error) {
+            console.log(error);
         }
     }
 }

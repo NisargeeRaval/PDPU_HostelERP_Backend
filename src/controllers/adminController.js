@@ -3,7 +3,7 @@ const student_model = require('../models/studentModel');
 const parents_model = require('../models/parentsModel');
 const hostel_model = require('../models/hostelModel');
 const update_path = require('../utilities/response_image_url');
-const sendEmail = require('../services/sendEmailService');
+const { sendEmail } = require('../services/sendEmailService');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const passwordGenerator = require('../utilities/random_password_generator');
@@ -12,7 +12,7 @@ require('dotenv').config();
 module.exports = class Admin {
     async register(req, res) {
         try {
-            const { email, password, phone } = req.body;
+            const { email, password, phone, name } = req.body;
 
             // Check if user already exists
             const existingUser = await admin_model.findOne({ email });
@@ -31,7 +31,9 @@ module.exports = class Admin {
             const admin = new admin_model({
                 email,
                 password: hashedPassword,
-                phone
+                phone,
+                name,
+                photo: req.file.filename
             });
 
             await admin.save();
@@ -50,7 +52,7 @@ module.exports = class Admin {
 
     async load_dashboard_page(req, res) {
         try {
-            return res.render('HTML/admin/adminHome.ejs', { userData: null });
+            return res.render('HTML/admin/adminHome.ejs');
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while fetching data. Reload the page again!";
@@ -79,6 +81,8 @@ module.exports = class Admin {
                 for (let j = 0; j < student[i].proof.length; j++) {
                     student[i].proof[j] = await update_path("student", student[i].proof[j]);
                 }
+
+                student[i].proof.push(await update_path("student", student[i].profile));
             }
 
             return res.render('HTML/admin/verifyStudent.ejs', { student: student });
@@ -405,7 +409,7 @@ module.exports = class Admin {
             });
 
             for (let i = 0; i < students.length; i++) {
-                students[i].proof[0] = await update_path("student", students[i].proof[0]);
+                students[i].profile = await update_path("student", students[i].profile);
             }
 
             return res.status(200).json(students);
@@ -491,8 +495,12 @@ module.exports = class Admin {
                 address,
             }
 
-            if (req.files && req.files.length > 0) {
-                updatedUser.proof = req.files.map((file) => file.filename);
+            if (req.files.proof && req.files.proof.length > 0) {
+                updatedUser.proof = req.files.proof.map((file) => file.filename);
+            }
+
+            if (req.files.profile[0] && rreq.files.profile[0].length > 0) {
+                updatedUser.proof = req.files.profile[0].filename;
             }
 
             updatedUser.status = 'false';
@@ -511,6 +519,48 @@ module.exports = class Admin {
             const headingMessage = "Something went wrong";
             const paragraphMessage = 'Student data not updated';
             const newRoute = '/user/login';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async load_profile_page(req, res) {
+        try {
+            const userID = req.user._id;
+
+            const admin = await admin_model.findById(userID).select('-password');
+
+            admin.photo = await update_path('admin', admin.photo);
+
+            return res.render('HTML/admin/profile.ejs', { admin: admin });
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while fetching data. Reload the page again!";
+            const newRoute = '/admin/dashboard';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async update_profile(req, res) {
+        try {
+            const userID = req.user._id;
+
+            const { email, phone } = req.body;
+
+            const updated_admin_data = {
+                email,
+                phone
+            };
+
+            await admin_model.findByIdAndUpdate(userID, updated_admin_data);
+
+            const headingMessage = "Updated Succesfully";
+            const paragraphMessage = "Your profile data updated succesfully!";
+            const newRoute = '/admin/profile';
+            return res.render('utilities/responseMessageSuccess.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while updating profile data. Please try again!";
+            const newRoute = '/admin/profile';
             return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }

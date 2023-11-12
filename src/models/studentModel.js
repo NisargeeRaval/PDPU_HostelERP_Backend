@@ -14,6 +14,7 @@ const studentSchema = new mongoose.Schema({
         address: { type: String, required: true },
         status: { type: String, enum: ['true', 'false', 'passout', 'block'], default: false },
         proof: [{ type: String }],
+        profile: { type: String },
         enrolled: { type: String, enum: ['true', 'false'], default: false },
         parentsid: { type: mongoose.Schema.Types.ObjectId },
     },

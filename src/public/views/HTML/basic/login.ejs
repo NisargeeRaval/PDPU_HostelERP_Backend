@@ -20,25 +20,72 @@
         <img src="/views/Images/logo.png">
         <h3>Pandit Deendayal Energy University</h3>
       </div>
-      <form action="/user/api/login" method="post">
-        <div class="login-main">
-          <div>
-            <label for="email">Email</label>&emsp;&emsp;
-            <input type="text" id="email" name="email" required>
-          </div>
-          <div>
-            <label for="password">Password</label>&emsp;&emsp;&nbsp;
-            <input type="password" id="password" name="password" required>
-          </div>
-          <div class="links">
-            <a href="/user/forgetPassword">Forget Password</a>
-            <a href="/user/register">Register</a>
-          </div>
-          <button class="btn" type="submit">Login</button>
+      <!-- <form action="/user/api/login" method="post"> -->
+      <div class="login-main">
+        <div>
+          <label for="email">Email</label>&emsp;&emsp;
+          <input type="text" id="email" name="email" required>
         </div>
-      </form>
+        <div>
+          <label for="password">Password</label>&emsp;&emsp;&nbsp;
+          <input type="password" id="password" name="password" required>
+        </div>
+        <div class="links">
+          <a href="/user/forgetPassword">Forget Password</a>
+          <a href="/user/register">Register</a>
+        </div>
+        <button class="btn" type="submit" onclick="login()">Login</button>
+      </div>
+      <!-- </form> -->
     </div>
   </div>
 </body>
+
+<script>
+  async function login() {
+    try {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const result = await fetch('/user/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password
+        }),
+      });
+
+      if (result.status === 200) {
+        const data = await result.json();
+
+        localStorage.setItem('token', data.token);
+
+        if (data.role == 'student') {
+          window.location.href = '/student/dashboard';
+        } else if (data.role == 'admin') {
+          window.location.href = '/admin/dashboard';
+        } else if (data.role == 'warden') {
+          window.location.href = '/warden/dashboard';
+        } else if (data.role == 'parents') {
+          window.location.href = '/parents/dashboard';
+        }
+      } else {
+        const data = await result.json();
+
+        const queryString = `?headingMessage=${encodeURIComponent(data.headingMessage)}&paragraphMessage=${encodeURIComponent(data.paragraphMessage)}&newRoute=${encodeURIComponent(data.newRoute)}`;
+
+        window.location.href = '/response/error' + queryString;
+      }
+    } catch (error) {
+
+      const queryString = `?headingMessage=${encodeURIComponent('Something went wrong')}&paragraphMessage=${encodeURIComponent('Error while login! Try to contact admin')}&newRoute=${encodeURIComponent('/user/login')}`;
+
+      window.location.href = '/response/error' + queryString;
+    }
+  }
+</script>
 
 </html>

@@ -3,6 +3,9 @@ const router = express.Router();
 const hostel_controller = require("../controllers/hostelController");
 const multer = require('multer');
 const path = require('path');
+const jwt_middleware = require('../middleware/jwtMiddleware');
+const admin_middlware = require('../middleware/adminMiddleware');
+const multi_role_based_middleware = require('../middleware/multiRoleBasedMiddleware');
 
 const HostelClass = new hostel_controller();
 
@@ -29,11 +32,13 @@ const upload = multer({
     }
 });
 
-router.get("/viewHostel", (req, res) => HostelClass.load_hostel_detail_page(req, res));
-router.get("/createHostel", (req, res) => HostelClass.load_add_hostel__page(req, res));
-router.post("/api/create", upload.array("hostelPhotos"), (req, res) => HostelClass.add_hostel(req, res));
-router.post("/api/update", upload.array("hostelPhotos"), (req, res) => HostelClass.update_hostel(req, res));
-router.get("/hostelLayout", (req, res) => HostelClass.load_hostel_layout_page(req, res));
-router.get("/roomDetails", (req, res) => HostelClass.load_room_detail_page(req, res));
+router.get("/viewHostel", jwt_middleware, admin_middlware, (req, res) => HostelClass.load_hostel_detail_page(req, res));
+router.get("/createHostel", jwt_middleware, admin_middlware, (req, res) => HostelClass.load_add_hostel__page(req, res));
+router.post("/api/create", jwt_middleware, admin_middlware, upload.array("hostelPhotos"), (req, res) => HostelClass.add_hostel(req, res));
+router.post("/api/update", jwt_middleware, admin_middlware, upload.array("hostelPhotos"), (req, res) => HostelClass.update_hostel(req, res));
+
+const admin_warden_student = ['admin', 'warden', 'student'];
+router.get("/hostelLayout", jwt_middleware, multi_role_based_middleware(admin_warden_student), (req, res) => HostelClass.load_hostel_layout_page(req, res));
+router.get("/roomDetails", jwt_middleware, multi_role_based_middleware(admin_warden_student), (req, res) => HostelClass.load_room_detail_page(req, res));
 
 module.exports = router;

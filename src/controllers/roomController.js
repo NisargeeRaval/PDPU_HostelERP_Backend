@@ -106,7 +106,9 @@ module.exports = class Room {
 
     async book_hostel(req, res) {
         try {
-            const { hostelSelect, roomSelect, userID } = req.body;
+            const { hostelSelect, roomSelect } = req.body;
+
+            const userID = req.user._id;
 
             const student = await student_model.findById(userID);
 
@@ -137,7 +139,6 @@ module.exports = class Room {
             const newRoute = '/student/dashboard';
             return res.render('utilities/responseMessageSuccess.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         } catch (error) {
-            console.log(error);
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while booking hostel. Try to book hostel again!";
             const newRoute = '/student/bookHostel';

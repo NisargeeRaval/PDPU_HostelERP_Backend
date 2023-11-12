@@ -34,4 +34,35 @@ const sendEmail = (to, subject, text, html, callback) => {
     });
 };
 
-module.exports = sendEmail;
+const sendEmailToMultipleUsers = (recipients, subject, text, html, attachments, callback) => {
+    if (!Array.isArray(recipients)) {
+        recipients = [recipients]; // Ensure recipients is an array
+    }
+
+    const mailOptions = {
+        from: process.env.NODE_MAILER_USER_EMAIL,
+        to: recipients.join(', '), // Join multiple email addresses with commas
+        subject,
+        text,
+        html,
+        attachments, // Attachments should be an array of attachment objects
+        contentType: 'text/html'
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error('Error sending email:', error);
+            if (callback) {
+                callback(error);
+            }
+        } else {
+            console.log('Email sent:', info.response);
+            if (callback) {
+                callback(null, info);
+            }
+        }
+    });
+};
+
+
+module.exports = { sendEmail, sendEmailToMultipleUsers };

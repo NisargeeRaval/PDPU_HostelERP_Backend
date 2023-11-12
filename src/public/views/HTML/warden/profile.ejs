@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Warden| Profile</title>
+  <!-- Link to Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <%- include('./nav.ejs') %>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <img src="<%= warden.wardenPhoto %>" alt="Admin Profile" class="img-fluid rounded-circle" style="max-width: 100%;">
+      </div>
+      <div class="col-md-8">
+        <form id="adminForm" action="/warden/updateProfile" method="POST">
+          <div class="mb-3">
+            <label for="_id" class="form-label">_id:</label>
+            <input type="text" class="form-control" name="_id" value="<%= warden._id %>" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="wardenName" class="form-label">Warden Name:</label>
+            <input type="text" class="form-control" name="wardenName" value="<%= warden.wardenName %>" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="text" class="form-control" name="email" value="<%= warden.email %>" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="mobile" class="form-label">Mobile Number:</label>
+            <input type="text" class="form-control" name="mobile" value="<%= warden.mobile %>" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="hostel" class="form-label">Hostel:</label>
+            <input type="text" class="form-control" name="hostel" value="<%= warden.hostelName %>" readonly>
+          </div>
+          <div class="mb-3">
+            <label for="status" class="form-label">Status:</label>
+            <input type="text" class="form-control" name="status" value="<%= warden.status %>" readonly>
+          </div>
+          <!-- Edit button to toggle read-only mode and show submit button -->
+          <button type="button" class="btn btn-primary" onclick="toggleEditMode()" id="editButton" style="display: block">Edit</button>
+
+          <!-- Submit button to save changes (initially hidden) -->
+          <button type="submit" class="btn btn-success" id="submitButton" style="display: none">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleEditMode() {
+      const form = document.getElementById('adminForm');
+      const inputs = form.getElementsByTagName('input');
+      const submitButton = document.getElementById('submitButton');
+      const editButton = document.getElementById('editButton');
+
+      for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].name === 'mobile') {
+          inputs[i].readOnly = false;
+        } else {
+          inputs[i].readOnly = true;
+        }
+      }
+
+      // Toggle the visibility of the submit button
+      submitButton.style.display = 'block';
+      editButton.style.display = 'none';
+    }
+  </script>
+
+</body>
+
+</html>

@@ -6,7 +6,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
   <div class="container">
-    <a class="navbar-brand" href="/student/dashboard">Hostel ERP Student</a>
+    <a class="navbar-brand" href="/warden/dashboard">Hostel ERP Warden</a>
     <div class="ml-auto">
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
@@ -14,19 +14,9 @@
             Hostel
           </a>
           <ul class="dropdown-menu" aria-labelledby="hostelManagementDropdown">
-            <li><a class="dropdown-item" href="/student/bookHostel">Book Hostel</a></li>
-            <li><a class="dropdown-item" href="#">My room details left to work on</a></li>
-            <li><a class="dropdown-item" href="#">Complaint left to work on</a></li>
-            <li><a class="dropdown-item" href="#">Attendance left to work on</a></li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="hostelManagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Leave
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="hostelManagementDropdown">
-            <li><a class="dropdown-item" href="#">Apply for Short Leave left to work on</a></li>
-            <li><a class="dropdown-item" href="#">Apply for Long Leave left to work on</a></li>
+            <li><a class="dropdown-item" href="/hostel/hostelLayout">View Hostel</a></li>
+            <li><a class="dropdown-item" href="#">Grant Leave</a></li>
+            <li><a class="dropdown-item" href="#">Attendance</a></li>
           </ul>
         </li>
         <li class="nav-item dropdown">
@@ -35,14 +25,15 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="studentManagementDropdown">
             <li><a class="dropdown-item" href="/admin/viewStudent">Search Student</a></li>
+            <li><a class="dropdown-item" href="#">Complaints</a></li>
+            <li><a class="dropdown-item" href="/warden/sendEmail">Send Email</a></li>
           </ul>
-        </li>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#" id="logoutButton" onclick="logout()">Logout</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/student/profile" id="logoutButton">Profile</a>
+          <a class="nav-link" href="/warden/profile" id="logoutButton">Profile</a>
         </li>
       </ul>
     </div>

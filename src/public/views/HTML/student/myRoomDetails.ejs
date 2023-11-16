@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student| My Room</title>
+  <!-- Link to Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <%- include('./nav.ejs') %>
+</head>
+
+<body>
+  <div class="container mt-5">
+
+    <div class="row mt-4" id="searchResults">
+      <% if(roomDetails.length <= 0) {%>
+      <div class="container">
+        <div class="alert alert-info custom-alert" role="alert">
+          You have not booked any room. Click <a href="/student/bookHostel" class="btn btn-primary custom-btn mx-2">Book Room</a> to book a room.
+        </div>
+      </div>
+      <% } else {%>
+      <div class="row mt-4" id="searchResults">
+        <% roomDetails[0].student.forEach(user => { %>
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <img src="<%= user.profile %>" alt="<%= user.firstname %>" class="card-img-top" style="max-height: 200px;">
+            <div class="card-body">
+              <h5 class="card-title"><%= user.firstname + " " + user.lastname %></h5>
+              <p class="card-text">Email: <%= user.email %></p>
+              <p class="card-text">Roll No: <%= user.rollno %></p>
+              <p class="card-text">Mobile No: <%= user.mobileno %></p>
+              <p class="card-text">Parent's Mobile: <%= user.parentsname %></p>
+              <p class="card-text">Parent's Email: <%= user.parentsemail %></p>
+              <p class="card-text">Parent's Mobile No: <%= user.parentsmobile %></p>
+              <p class="card-text">Address: <%= user.address %></p>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+      <%} %>
+    </div>
+  </div>
+</body>
+
+</html>

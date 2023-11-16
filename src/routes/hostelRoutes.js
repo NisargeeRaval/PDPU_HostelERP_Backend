@@ -37,8 +37,9 @@ router.get("/createHostel", jwt_middleware, admin_middlware, (req, res) => Hoste
 router.post("/api/create", jwt_middleware, admin_middlware, upload.array("hostelPhotos"), (req, res) => HostelClass.add_hostel(req, res));
 router.post("/api/update", jwt_middleware, admin_middlware, upload.array("hostelPhotos"), (req, res) => HostelClass.update_hostel(req, res));
 
-const admin_warden_student = ['admin', 'warden', 'student'];
+const admin_warden_student = ['admin', 'warden'];
 router.get("/hostelLayout", jwt_middleware, multi_role_based_middleware(admin_warden_student), (req, res) => HostelClass.load_hostel_layout_page(req, res));
 router.get("/roomDetails", jwt_middleware, multi_role_based_middleware(admin_warden_student), (req, res) => HostelClass.load_room_detail_page(req, res));
+router.post("/api/cancleBooking", jwt_middleware, multi_role_based_middleware(admin_warden_student), (req, res) => HostelClass.cancle_hostel_booking(req, res));
 
 module.exports = router;

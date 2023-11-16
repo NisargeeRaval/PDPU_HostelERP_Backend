@@ -22,11 +22,26 @@
         </div>
       </div>
       <% } else {%>
+      <form action="/hostel/api/cancleBooking" method="POST">
+        <div class="mb-3">
+          <label for="studentSelect" class="form-label">Select Student</label>
+          <select class="form-select" id="studentSelect" name="studentId">
+            <!-- Loop through student data to create options -->
+            <% let isFirst = true; %>
+            <% roomDetails[0].user.forEach(user => { %>
+            <option value="<%= user._id %>" <% if (isFirst) { isFirst = false; %>selected<% } %>><%= user.firstname + " " + user.lastname %></option>
+            <% }); %>
+          </select>
+        </div>
+        <input type="hidden" name="roomId" value="<%= roomDetails[0]._id %>">
+        <button type="submit" class="btn btn-primary">Cancle student booking</button>
+      </form>
+
       <div class="row mt-4" id="searchResults">
         <% roomDetails[0].user.forEach(user => { %>
         <div class="col-md-4 mb-4">
           <div class="card">
-            <img src="<%= user.proof[0] %>" alt="<%= user.firstname %>" class="card-img-top">
+            <img src="<%= user.profile %>" alt="<%= user.firstname %>" class="card-img-top" style="max-height: 200px;">
             <div class="card-body">
               <h5 class="card-title"><%= user.firstname + " " + user.lastname %></h5>
               <p class="card-text">Email: <%= user.email %></p>

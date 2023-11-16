@@ -114,7 +114,7 @@ module.exports = class Room {
 
             if (student.enrolled == 'true') {
                 const headingMessage = "Can not book Room";
-                const paragraphMessage = "You can not book room!You already have one booked room. Cancle your current booked room to avail new room.";
+                const paragraphMessage = "You can not book room!You already have one booked room. Cancel your current booked room to avail new room.";
                 const newRoute = '/student/dashboard';
                 return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
             }
@@ -128,7 +128,8 @@ module.exports = class Room {
                 return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
             }
 
-            room.user = userID;
+            room.user.push(userID);
+
             await room.save();
 
             student.enrolled = 'true';

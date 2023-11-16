@@ -74,5 +74,6 @@ router.post("/api/userUpdateDetails", studentFileUpload, (req, res) => AdminClas
 
 router.get('/profile', jwt_middleware, admin_middlware, (req, res) => AdminClass.load_profile_page(req, res));
 router.post('/updateProfile', jwt_middleware, admin_middlware, (req, res) => AdminClass.update_profile(req, res));
+router.post('/api/resetHostel', jwt_middleware, admin_middlware, (req, res) => AdminClass.reset_hostel(req, res));
 
 module.exports = router;

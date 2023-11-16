@@ -12,6 +12,25 @@ module.exports = class Basic {
 
     async load_login_page(req, res) {
         try {
+            //if already login in redirect to dashboard page
+            if (req.cookies.token) {
+                const token = req.cookies.token;
+
+                const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+                const role = decoded.role;
+
+                if (role == 'student') {
+                    return res.render('HTML/student/studentHome.ejs');
+                } else if (role == 'admin') {
+                    return res.render('HTML/admin/adminHome.ejs');
+                } else if (role == 'warden') {
+                    return res.render('HTML/warden/wardenHome.ejs');
+                } else if (role == 'parents') {
+                    console.log('left to work on redirecting to parents dashboard');
+                }
+            }
+
             return res.render('HTML/basic/login');
         } catch (error) {
             const headingMessage = "Something went wrong";
@@ -157,7 +176,7 @@ module.exports = class Basic {
                     mobileno: parents.mobileno,
                     email: parents.email,
                     name: parents.name,
-                    role: 'warden'
+                    role: 'parents'
                 };
 
                 const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
@@ -180,7 +199,7 @@ module.exports = class Basic {
             const headingMessage = "Something went Wrong";
             const paragraphMessage = "Error while login. Try to login again!";
             const newRoute = '/user/login';
-            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.status(400).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 

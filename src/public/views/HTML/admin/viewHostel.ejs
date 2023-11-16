@@ -29,6 +29,57 @@
 </head>
 
 <body>
+  <!-- Loading Modal -->
+  <div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" data-bs-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loadingModalLabel">Loading...</h5>
+        </div>
+        <div class="modal-body">
+          <!-- Loading spinner -->
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal" tabindex="-1" id="confirmationModal" data-bs-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to reset the hostel?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="confirmNoButton" data-bs-dismiss="modal">No</button>
+          <button type="button" class="btn btn-primary" id="confirmYesButton">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acknowledgement Modal -->
+  <div class="modal" tabindex="-1" id="acknowledgementModal" data-bs-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Succesfully</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="refreshButton"></button>
+        </div>
+        <div class="modal-body">
+          Hostel reset succesfully! <b><u>enrollmentActivity is set to "false" automatically</u></b>, please change it as per your needs.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="editFormContainer" style="display: none;">
     <!-- Edit form will be dynamically generated here -->
   </div>
@@ -41,12 +92,12 @@
       </div>
     </div>
   </div>
+
   <div class="container">
     <% if (Array.isArray(hostelData) && hostelData.length === 0) { %>
     <div class="container">
       <div class="alert alert-info custom-alert" role="alert">
-        No hostels found. Click below to add a hostel.
-        <a href="/hostel/createHostel" class="btn btn-primary custom-btn mx-2">Add Hostel</a>
+        No hostels found. Click <a href="/hostel/createHostel" class="btn btn-primary custom-btn mx-2">Add Hostel</a> to add a hostel.
       </div>
     </div>
     <% } else { %>
@@ -74,6 +125,9 @@
           <td>
             <button type="button" class="btn btn-warning" id="<%= hostel._id %>" onclick="showEditForm(this)">
               <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="btn btn-danger" id="<%= hostel._id %>" onclick="resetPopUp(this)">
+              <i class="fas fa-sync"></i>
             </button>
           </td>
         </tr>
@@ -187,6 +241,68 @@
 
       // Show the edit form container
       editFormContainer.style.display = 'block';
+    }
+  }
+
+  function resetPopUp(button) {
+    const editFormContainer = document.getElementById('editFormContainer');
+    const rowData = button.closest('tr').getAttribute('data-hostel');
+    const hostelDetails = JSON.parse(rowData);
+
+    if (hostelDetails) {
+      // Show Bootstrap modal for confirmation
+      const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+      confirmationModal.show();
+
+      // Set up event listener for the "Yes" button in the modal
+      document.getElementById('confirmYesButton').addEventListener('click', async function() {
+        try {
+          confirmationModal.hide();
+
+          const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+          loadingModal.show();
+
+          const result = await fetch('/admin/api/resetHostel', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              hostelID: hostelDetails._id
+            }),
+          });
+
+          if (result.status === 200) {
+            await result.json();
+
+            loadingModal.hide();
+            const acknowledgementModal = new bootstrap.Modal(document.getElementById('acknowledgementModal'));
+            acknowledgementModal.show();
+          } else {
+            await result.json();
+
+            const queryString = `?headingMessage=${encodeURIComponent('Something went wrong')}&paragraphMessage=${encodeURIComponent('Error while reseting hostel data. Try to reset hostel data again!')}&newRoute=${encodeURIComponent('/admin/dashboard')}`;
+
+            window.location.href = '/response/error' + queryString;
+          }
+        } catch (error) {
+
+          const queryString = `?headingMessage=${encodeURIComponent('Something went wrong')}&paragraphMessage=${encodeURIComponent('Error while reseting hostel data. Try to reset hostel data again!')}&newRoute=${encodeURIComponent('/admin/dashboard')}`;
+
+          window.location.href = '/response/error' + queryString;
+        }
+      });
+
+      // Set up event listener for the "No" button in the modal
+      document.getElementById('confirmNoButton').addEventListener('click', function() {
+        // Close the modal
+        confirmationModal.hide();
+      });
+
+      document.getElementById('refreshButton').addEventListener('click', function() {
+        // Reload the page
+        location.reload();
+      });
     }
   }
 </script>

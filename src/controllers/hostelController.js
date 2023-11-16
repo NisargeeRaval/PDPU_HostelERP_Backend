@@ -1,5 +1,6 @@
 const hostel_model = require('../models/hostelModel');
 const room_model = require('../models/roomModel');
+const student_model = require('../models/studentModel');
 const room_controller = require("../controllers/roomController");
 const update_path = require('../utilities/response_image_url');
 const { default: mongoose } = require('mongoose');
@@ -148,7 +149,7 @@ module.exports = class Hostel {
         try {
             let hostelID = req.query.hostelID;
 
-            if(req.user.role === 'warden') {
+            if (req.user.role === 'warden') {
                 hostelID = req.user.hostel;
             }
 
@@ -184,16 +185,34 @@ module.exports = class Hostel {
             ]);
 
             for (var i = 0; i < roomDetails[0].user.length; i++) {
-                for (var j = 0; j < roomDetails[0].user[i].proof.length; j++) {
-                    roomDetails[0].user[i].proof[j] = await update_path('student', roomDetails[0].user[i].proof[j]);
-                }
+                roomDetails[0].user[i].profile = await update_path('student', roomDetails[0].user[i].profile);
             }
 
             return res.render('HTML/hostel/roomDetails.ejs', { roomDetails: roomDetails });
         } catch (error) {
-            console.log(error);
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Please Try to reload the page!";
+            const newRoute = '/hostel/viewHostel';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async cancle_hostel_booking(req, res) {
+        try {
+            const { studentId, roomId } = req.body;
+
+            await room_model.findByIdAndUpdate(roomId, { $pull: { user: studentId } });
+
+            await student_model.findByIdAndUpdate(studentId, { enrolled: 'false' });
+
+            const headingMessage = "User removed succesfully!";
+            const paragraphMessage = "user removed from room";
+            const newRoute = `/hostel/roomDetails?roomID=${roomId}`;
+            return res.render('utilities/responseMessageSuccess.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while removing user from room! Please try again";
             const newRoute = '/hostel/viewHostel';
             return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }

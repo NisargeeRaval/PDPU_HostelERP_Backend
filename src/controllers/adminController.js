@@ -2,6 +2,7 @@ const admin_model = require('../models/adminModel');
 const student_model = require('../models/studentModel');
 const parents_model = require('../models/parentsModel');
 const hostel_model = require('../models/hostelModel');
+const room_model = require('../models/roomModel');
 const update_path = require('../utilities/response_image_url');
 const { sendEmail } = require('../services/sendEmailService');
 const bcrypt = require('bcrypt');
@@ -562,6 +563,31 @@ module.exports = class Admin {
             const paragraphMessage = "Error while updating profile data. Please try again!";
             const newRoute = '/admin/profile';
             return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async reset_hostel(req, res) {
+        try {
+            const hostelID = req.body.hostelID;
+
+            // Find user IDs from the updated rooms
+            const roomsWithUsers = await room_model.find({ hostelID, user: { $exists: true, $ne: [] } });
+            const userIds = roomsWithUsers.flatMap(room => room.user);
+
+            // Update students with matching user IDs to set enrolled status to false
+            await student_model.updateMany({ _id: { $in: userIds } }, { $set: { enrolled: 'false' } });
+
+            // Update rooms to reset user field
+            await room_model.updateMany({ hostelID }, { $set: { user: [] } });
+
+            await hostel_model.findByIdAndUpdate(hostelID, { enrollmentActivity: 'false' });
+
+            return res.status(200).json({ message: 'ok' });
+        } catch (error) {
+            const headingMessage = 'Something went Wrong';
+            const paragraphMessage = 'Error while resetting hostel data. Try to reset hostel data again!';
+            const newRoute = '/admin/dashboard';
+            return res.status(400).json({ headingMessage, paragraphMessage, newRoute });
         }
     }
 };

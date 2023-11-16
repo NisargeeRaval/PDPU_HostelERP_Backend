@@ -10,5 +10,6 @@ router.get("/dashboard", jwt_middleware, student_middlware, (req, res) => Studen
 router.get("/bookHostel", jwt_middleware, student_middlware, (req, res) => StudentClass.load_book_hostel_page(req, res));
 router.get('/profile', jwt_middleware, student_middlware, (req, res) => StudentClass.load_profile_page(req, res));
 router.post('/updateProfile', jwt_middleware, student_middlware, (req, res) => StudentClass.update_profile(req, res));
+router.get('/myRoomDetails', jwt_middleware, student_middlware, (req, res) => StudentClass.load_my_room_details_page(req, res));
 
 module.exports = router;

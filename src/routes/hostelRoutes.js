@@ -40,6 +40,6 @@ router.post("/api/update", jwt_middleware, admin_middlware, upload.array("hostel
 const admin_warden_student = ['admin', 'warden'];
 router.get("/hostelLayout", jwt_middleware, multi_role_based_middleware(admin_warden_student), (req, res) => HostelClass.load_hostel_layout_page(req, res));
 router.get("/roomDetails", jwt_middleware, multi_role_based_middleware(admin_warden_student), (req, res) => HostelClass.load_room_detail_page(req, res));
-router.post("/api/cancleBooking", jwt_middleware, multi_role_based_middleware(admin_warden_student), (req, res) => HostelClass.cancle_hostel_booking(req, res));
+router.post("/api/cancelBooking", jwt_middleware, multi_role_based_middleware(admin_warden_student), (req, res) => HostelClass.cancel_hostel_booking(req, res));
 
 module.exports = router;

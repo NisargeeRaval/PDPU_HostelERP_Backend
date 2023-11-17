@@ -22,7 +22,7 @@
         </div>
       </div>
       <% } else {%>
-      <form action="/hostel/api/cancleBooking" method="POST">
+      <form action="/hostel/api/cancelBooking" method="POST">
         <div class="mb-3">
           <label for="studentSelect" class="form-label">Select Student</label>
           <select class="form-select" id="studentSelect" name="studentId">
@@ -34,7 +34,7 @@
           </select>
         </div>
         <input type="hidden" name="roomId" value="<%= roomDetails[0]._id %>">
-        <button type="submit" class="btn btn-primary">Cancle student booking</button>
+        <button type="submit" class="btn btn-primary">Cancel student booking</button>
       </form>
 
       <div class="row mt-4" id="searchResults">

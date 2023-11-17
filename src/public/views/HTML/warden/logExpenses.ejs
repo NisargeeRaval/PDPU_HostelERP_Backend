@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Warden| Expense Log</title>
+  <%- include('./nav.ejs') %>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10 text-center">
+        <h1>Log Expenses</h1>
+        <hr class="my-4 border-4"> <!-- Use 'border-4' to make the line thicker -->
+      </div>
+    </div>
+  </div>
+  <div class="container mt-5">
+    <!-- Expense Log Table -->
+    <div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>
+              <select id="wardenFilter">
+                <option value="">Filter by Warden</option>
+                <% const uniqueWardens = Array.from(new Set(expenses.map(expense => expense.warden.wardenName))); %>
+                <% uniqueWardens.forEach(warden => { %>
+                  <option value="<%= warden %>"><%= warden %></option>
+                <% }); %>
+              </select>
+            </th>
+            <th>
+              <select id="dateFilter">
+                <option value="">Filter by Date</option>
+                <% const uniqueDates = Array.from(new Set(expenses.map(expense => expense.createdAt.toDateString()))); %>
+                <% uniqueDates.forEach(date => { %>
+                  <option value="<%= date %>"><%= date %></option>
+                <% }); %>
+              </select>
+            </th>
+            <th>
+              <select id="hostelFilter">
+                <option value="">Filter by Hostel</option>
+                <% const uniqueHostels = Array.from(new Set(expenses.map(expense => expense.hostel.hostelName))); %>
+                <% uniqueHostels.forEach(hostel => { %>
+                  <option value="<%= hostel %>"><%= hostel %></option>
+                <% }); %>
+              </select>
+            </th>
+            <th>Amount</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody id="expenseLogs">
+          <% expenses.forEach(expense => { %>
+            <tr>
+              <td><%= expense.warden.wardenName %></td>
+              <td><%= expense.createdAt.toDateString() %></td>
+              <td><%= expense.hostel.hostelName %></td>
+              <td><%= expense.expenseAmount %></td>
+              <td><%= expense.reason %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    // Event listeners for dropdown changes
+    document.getElementById('wardenFilter').addEventListener('change', filterTable);
+    document.getElementById('dateFilter').addEventListener('change', filterTable);
+    document.getElementById('hostelFilter').addEventListener('change', filterTable);
+  
+    function filterTable() {
+      const wardenFilter = document.getElementById('wardenFilter').value;
+      const dateFilter = document.getElementById('dateFilter').value;
+      const hostelFilter = document.getElementById('hostelFilter').value; 
+      const tableRows = document.querySelectorAll('#expenseLogs tr');
+  
+      tableRows.forEach(row => {
+        const wardenName = row.querySelector('td:nth-child(1)').textContent;
+        const date = row.querySelector('td:nth-child(2)').textContent;
+        const hostelName = row.querySelector('td:nth-child(3)').textContent;
+        if (wardenName.includes(wardenFilter) &&
+            date.includes(dateFilter) &&
+            hostelName.includes(hostelFilter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 const hostel_model = require('../models/hostelModel');
 const warden_model = require('../models/wardenModel');
 const room_model = require('../models/roomModel');
+const expense_model = require("../models/expenseModel")
 const student_model = require('../models/studentModel');
 const update_path = require('../utilities/response_image_url');
 const fs = require('fs');
@@ -483,6 +484,168 @@ module.exports = class Warden {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while updating profile data. Please try again!";
             const newRoute = '/admin/profile';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async load_add_expense_page(req, res) {
+        try {
+            return res.render('HTML/warden/addExpense.ejs');
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while loading page. Reload the page again!";
+            const newRoute = '/warden/dashboard';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async add_expense(req, res){
+        try {
+            const warden = req.user._id;
+            const hostel = req.user.hostel;
+            const expenseAmount = req.body.amount;
+            const reason = req.body.reason;
+            const expense = new expense_model({
+                hostel,
+                warden,
+                expenseAmount,
+                reason
+            });
+
+            await expense.save()
+
+            const headingMessage = "Expense Succesfully Added!";
+            const paragraphMessage = `Click "OK" to view expenses!`;
+            const newRoute = '/warden/logExpenses';
+            return res.render('utilities/responseMessageSuccess.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while adding Expense. Try adding the expense again!";
+            const newRoute = '/warden/addExpense';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async load_log_expenses(req, res) {
+        try {
+            const expenses = await expense_model.aggregate([
+                {
+                  $lookup: {
+                    from: 'wardens', 
+                    localField: 'warden',
+                    foreignField: '_id',
+                    as: 'wardenInfo'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'hostels', 
+                    localField: 'hostel',
+                    foreignField: '_id',
+                    as: 'hostelInfo'
+                  }
+                },
+                {
+                  $project: {
+                    expenseAmount: 1,
+                    reason: 1,
+                    createdAt: 1,
+                    warden: { $arrayElemAt: ['$wardenInfo', 0] },
+                    hostel: { $arrayElemAt: ['$hostelInfo', 0] }
+                  }
+                }
+              ]);
+            
+            return res.render('HTML/warden/logExpenses.ejs', { expenses });
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while loading expense log. Please try again later.";
+            const newRoute = '/warden/dashboard'; 
+            return res.render('utilities/responseMessageError.ejs', { headingMessage, paragraphMessage, newRoute });
+            
+        }
+    }
+
+    async load_take_attendance_page(req, res) {
+        try {
+            const wardenName = req.user.wardenName;
+            const wardenWithHostel = await warden_model.aggregate([
+                {
+                  $match: { wardenName: wardenName },
+                //   createdAt: {
+                //     $gte: new Date(new Date().setHours(20, 0, 0)), // Today's 8 PM
+                //     $lt: new Date(new Date().setHours(23, 0, 0))   // Today's 11 PM
+                //   } 
+                },
+                {
+                  $lookup: {
+                    from: 'hostels',
+                    localField: 'hostel',
+                    foreignField: '_id',
+                    as: 'hostelDetails'
+                  }
+                },
+                {
+                  $unwind: '$hostelDetails'
+                },
+                {
+                  $addFields: {
+                    hostelName: '$hostelDetails.hostelName' 
+                  }
+                },
+                {
+                  $project: {
+                    _id: 0,
+                    wardenName: 1,
+                    hostelName: 1,
+                    hostel: 1
+                  }
+                }
+              ]);
+            
+            const hostelID = wardenWithHostel[0].hostel;
+            const hostelName = wardenWithHostel[0].hostelName;
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const students = await room_model.aggregate([
+                {
+                    $match: { hostelID: hostelID } 
+                },
+                {
+                    $lookup: {
+                        from: 'students',
+                        localField: 'user',
+                        foreignField: '_id',
+                        as: 'students'
+                    }
+                },
+                {
+                    $unwind: '$students' 
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        roomNumber: 1,
+                        'students.firstname': 1,
+                        'students.lastname' : 1
+                    }
+                }
+            ]);
+            return res.render('HTML/warden/takeAttendance.ejs', {
+                wardenName: wardenName,
+                hostelName: hostelName,
+                currentDate: currentDate,
+                students: students
+            });
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while loading page. Reload the page again!";
+            const newRoute = '/warden/dashboard';
             return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }

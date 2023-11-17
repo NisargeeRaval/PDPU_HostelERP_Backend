@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Warden| Attendance</title>
+  <%- include('./nav.ejs') %>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10 text-center">
+        <h1>Attendance</h1>
+        <hr class="my-4 border-4"> <!-- Use 'border-4' to make the line thicker -->
+      </div>
+    </div>
+  </div>
+  <div class="container mt-5">
+    <!-- Warden, Hostel Name, Date -->
+    <div class="mb-4">
+      <p>Warden: <%= wardenName %></p>
+      <p>Hostel: <%= hostelName %></p>
+      <p>Date: <%= currentDate %></p>
+    </div>
+
+    <!-- Attendance Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Room Number</th>
+            <th>Present (P)</th>
+            <th>Absent (A)</th>
+            <th>Leave (L)</th>
+            <th>OTP</th>
+            <th></th> <!-- Empty column for buttons -->
+          </tr>
+        </thead>
+        <tbody>
+          <% students.forEach(student => { %>
+            <tr>
+              <td><%= student.students.firstname %> <%= student.students.lastname %></td>
+              <td><%= student.roomNumber %></td>
+              <td><input type="radio" name="attendance_<%= student.name %>" value="P"></td>
+              <td><input type="radio" name="attendance_<%= student.name %>" value="A"></td>
+              <td><input type="radio" name="attendance_<%= student.name %>" value="L"></td>
+              <td><input type="text" name="otp_<%= student.name %>"></td>
+              <td>
+                <button class="btn btn-primary btn-sm"><i class="bi bi-chat-text"></i></button>
+                <button class="btn btn-success btn-sm"><i class="bi bi-check"></i></button>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center">
+      <button class="btn btn-primary">Submit Attendance</button>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

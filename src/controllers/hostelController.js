@@ -197,7 +197,7 @@ module.exports = class Hostel {
         }
     }
 
-    async cancle_hostel_booking(req, res) {
+    async cancel_hostel_booking(req, res) {
         try {
             const { studentId, roomId } = req.body;
 

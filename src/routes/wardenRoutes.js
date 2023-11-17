@@ -39,5 +39,8 @@ router.get("/sendEmail", jwt_middleware, warden_middlware, (req, res) => WardenC
 router.post("/api/sendEmail", jwt_middleware, warden_middlware, upload.array("attachments"), (req, res) => WardenClass.send_mail(req, res));
 router.get('/profile', jwt_middleware, warden_middlware, (req, res) => WardenClass.load_profile_page(req, res));
 router.post('/updateProfile', jwt_middleware, warden_middlware, (req, res) => WardenClass.update_profile(req, res));
-
+router.get("/addExpense", jwt_middleware, warden_middlware, (req, res) => WardenClass.load_add_expense_page(req, res))
+router.post("/api/addExpense", jwt_middleware, warden_middlware, (req, res) => WardenClass.add_expense(req, res));
+router.get("/logExpenses", jwt_middleware, warden_middlware, (req, res) => WardenClass.load_log_expenses(req, res))
+router.get("/takeAttendance", jwt_middleware, warden_middlware, (req, res) => WardenClass.load_take_attendance_page(req, res))
 module.exports = router;

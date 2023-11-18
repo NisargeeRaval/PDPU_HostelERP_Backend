@@ -609,10 +609,9 @@ module.exports = class Warden {
     async load_take_attendance_page(req, res) {
         try {
             const wardenName = req.user.wardenName;
-            const hostel_id = req.user.hostel;
             const warden_id = req.user._id;
-
-            const manav = await warden_model.aggregate([
+                
+            const wardenWithHostel = await warden_model.aggregate([
                 {
                     $match: { _id: new mongoose.Types.ObjectId(warden_id) }
                 },
@@ -625,43 +624,10 @@ module.exports = class Warden {
                     }
                 },
             ]);
-            console.log(manav[0].hostelDetails);
-            const wardenWithHostel = await warden_model.aggregate([
-                {
-                    $match: { wardenName: wardenName },
-                    //   createdAt: {
-                    //     $gte: new Date(new Date().setHours(20, 0, 0)), // Today's 8 PM
-                    //     $lt: new Date(new Date().setHours(23, 0, 0))   // Today's 11 PM
-                    //   } 
-                },
-                {
-                    $lookup: {
-                        from: 'hostels',
-                        localField: 'hostel',
-                        foreignField: '_id',
-                        as: 'hostelDetails'
-                    }
-                },
-                {
-                    $unwind: '$hostelDetails'
-                },
-                {
-                    $addFields: {
-                        hostelName: '$hostelDetails.hostelName'
-                    }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        wardenName: 1,
-                        hostelName: 1,
-                        hostel: 1
-                    }
-                }
-            ]);
 
-            const hostelID = wardenWithHostel[0].hostel;
-            const hostelName = wardenWithHostel[0].hostelName;
+            const hostelName = wardenWithHostel[0].hostelDetails[0].hostelName;
+            const hostelID = wardenWithHostel[0].hostelDetails[0]._id;
+
             const currentDate = new Date().toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',

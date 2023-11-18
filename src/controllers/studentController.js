@@ -125,4 +125,15 @@ module.exports = class Student {
             return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
+
+    async load_get_otp_page(req, res) {
+        try {
+            return res.render('HTML/student/markAttendance');
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while loading the page. Please try again!";
+            const newRoute = '/student/dashboard';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
 }

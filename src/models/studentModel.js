@@ -17,6 +17,7 @@ const studentSchema = new mongoose.Schema({
         profile: { type: String },
         enrolled: { type: String, enum: ['true', 'false'], default: false },
         parentsid: { type: mongoose.Schema.Types.ObjectId },
+        onLeave: { type: String, enum: ['true', 'false'], default: false }
     },
     {
         timestamps: true

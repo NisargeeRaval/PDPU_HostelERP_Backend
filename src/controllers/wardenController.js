@@ -499,7 +499,7 @@ module.exports = class Warden {
         }
     }
 
-    async add_expense(req, res){
+    async add_expense(req, res) {
         try {
             const warden = req.user._id;
             const hostel = req.user.hostel;
@@ -528,81 +528,138 @@ module.exports = class Warden {
 
     async load_log_expenses(req, res) {
         try {
-            const expenses = await expense_model.aggregate([
-                {
-                  $lookup: {
-                    from: 'wardens', 
-                    localField: 'warden',
-                    foreignField: '_id',
-                    as: 'wardenInfo'
-                  }
-                },
-                {
-                  $lookup: {
-                    from: 'hostels', 
-                    localField: 'hostel',
-                    foreignField: '_id',
-                    as: 'hostelInfo'
-                  }
-                },
-                {
-                  $project: {
-                    expenseAmount: 1,
-                    reason: 1,
-                    createdAt: 1,
-                    warden: { $arrayElemAt: ['$wardenInfo', 0] },
-                    hostel: { $arrayElemAt: ['$hostelInfo', 0] }
-                  }
-                }
-              ]);
-            
+            const role = req.user.role;
+
+            let expenses;
+
+            if (role == 'admin') {
+                expenses = await expense_model.aggregate([
+                    {
+                        $lookup: {
+                            from: 'wardens',
+                            localField: 'warden',
+                            foreignField: '_id',
+                            as: 'wardenInfo'
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'hostels',
+                            localField: 'hostel',
+                            foreignField: '_id',
+                            as: 'hostelInfo'
+                        }
+                    },
+                    {
+                        $project: {
+                            expenseAmount: 1,
+                            reason: 1,
+                            createdAt: 1,
+                            warden: { $arrayElemAt: ['$wardenInfo', 0] },
+                            hostel: { $arrayElemAt: ['$hostelInfo', 0] }
+                        }
+                    }
+                ]);
+            }
+
+            if (role == 'warden') {
+                const hostelID = req.user.hostel;
+
+                expenses = await expense_model.aggregate([
+                    {
+                        $match: { hostel: new mongoose.Types.ObjectId(hostelID) }
+                    },
+                    {
+                        $lookup: {
+                            from: 'wardens',
+                            localField: 'warden',
+                            foreignField: '_id',
+                            as: 'wardenInfo'
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'hostels',
+                            localField: 'hostel',
+                            foreignField: '_id',
+                            as: 'hostelInfo'
+                        }
+                    },
+                    {
+                        $project: {
+                            expenseAmount: 1,
+                            reason: 1,
+                            createdAt: 1,
+                            warden: { $arrayElemAt: ['$wardenInfo', 0] },
+                            hostel: { $arrayElemAt: ['$hostelInfo', 0] }
+                        }
+                    }
+                ]);
+            }
             return res.render('HTML/warden/logExpenses.ejs', { expenses });
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while loading expense log. Please try again later.";
-            const newRoute = '/warden/dashboard'; 
+            const newRoute = '/warden/dashboard';
             return res.render('utilities/responseMessageError.ejs', { headingMessage, paragraphMessage, newRoute });
-            
+
         }
     }
 
     async load_take_attendance_page(req, res) {
         try {
             const wardenName = req.user.wardenName;
+            const hostel_id = req.user.hostel;
+            const warden_id = req.user._id;
+
+            const manav = await warden_model.aggregate([
+                {
+                    $match: { _id: new mongoose.Types.ObjectId(warden_id) }
+                },
+                {
+                    $lookup: {
+                        from: 'hostels',
+                        localField: 'hostel',
+                        foreignField: '_id',
+                        as: 'hostelDetails'
+                    }
+                },
+            ]);
+            console.log(manav[0].hostelDetails);
             const wardenWithHostel = await warden_model.aggregate([
                 {
-                  $match: { wardenName: wardenName },
-                //   createdAt: {
-                //     $gte: new Date(new Date().setHours(20, 0, 0)), // Today's 8 PM
-                //     $lt: new Date(new Date().setHours(23, 0, 0))   // Today's 11 PM
-                //   } 
+                    $match: { wardenName: wardenName },
+                    //   createdAt: {
+                    //     $gte: new Date(new Date().setHours(20, 0, 0)), // Today's 8 PM
+                    //     $lt: new Date(new Date().setHours(23, 0, 0))   // Today's 11 PM
+                    //   } 
                 },
                 {
-                  $lookup: {
-                    from: 'hostels',
-                    localField: 'hostel',
-                    foreignField: '_id',
-                    as: 'hostelDetails'
-                  }
+                    $lookup: {
+                        from: 'hostels',
+                        localField: 'hostel',
+                        foreignField: '_id',
+                        as: 'hostelDetails'
+                    }
                 },
                 {
-                  $unwind: '$hostelDetails'
+                    $unwind: '$hostelDetails'
                 },
                 {
-                  $addFields: {
-                    hostelName: '$hostelDetails.hostelName' 
-                  }
+                    $addFields: {
+                        hostelName: '$hostelDetails.hostelName'
+                    }
                 },
                 {
-                  $project: {
-                    _id: 0,
-                    wardenName: 1,
-                    hostelName: 1,
-                    hostel: 1
-                  }
+                    $project: {
+                        _id: 0,
+                        wardenName: 1,
+                        hostelName: 1,
+                        hostel: 1
+                    }
                 }
-              ]);
-            
+            ]);
+
             const hostelID = wardenWithHostel[0].hostel;
             const hostelName = wardenWithHostel[0].hostelName;
             const currentDate = new Date().toLocaleDateString('en-US', {
@@ -611,10 +668,10 @@ module.exports = class Warden {
                 month: 'long',
                 day: 'numeric'
             });
-            
+
             const students = await room_model.aggregate([
                 {
-                    $match: { hostelID: hostelID } 
+                    $match: { hostelID: hostelID }
                 },
                 {
                     $lookup: {
@@ -625,14 +682,14 @@ module.exports = class Warden {
                     }
                 },
                 {
-                    $unwind: '$students' 
+                    $unwind: '$students'
                 },
                 {
                     $project: {
                         _id: 1,
                         roomNumber: 1,
                         'students.firstname': 1,
-                        'students.lastname' : 1
+                        'students.lastname': 1
                     }
                 }
             ]);

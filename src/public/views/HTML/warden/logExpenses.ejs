@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,16 +9,25 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
+
 <body>
   <div class="container mt-5">
     <div class="row justify-content-center">
       <div class="col-md-10 text-center">
         <h1>Log Expenses</h1>
         <hr class="my-4 border-4"> <!-- Use 'border-4' to make the line thicker -->
+        <h5>Total Expenses: <span id="totalExpenses"></span></h5>
       </div>
     </div>
   </div>
   <div class="container mt-5">
+    <% if (Array.isArray(expenses) && expenses.length === 0) { %>
+    <div class="container">
+      <div class="alert alert-info custom-alert" role="alert">
+        There are no expenses yet!
+      </div>
+    </div>
+    <% } else { %>
     <!-- Expense Log Table -->
     <div>
       <table class="table table-striped">
@@ -28,17 +38,20 @@
                 <option value="">Filter by Warden</option>
                 <% const uniqueWardens = Array.from(new Set(expenses.map(expense => expense.warden.wardenName))); %>
                 <% uniqueWardens.forEach(warden => { %>
-                  <option value="<%= warden %>"><%= warden %></option>
+                <option value="<%= warden %>"><%= warden %></option>
                 <% }); %>
               </select>
             </th>
             <th>
               <select id="dateFilter">
                 <option value="">Filter by Date</option>
-                <% const uniqueDates = Array.from(new Set(expenses.map(expense => expense.createdAt.toDateString()))); %>
-                <% uniqueDates.forEach(date => { %>
-                  <option value="<%= date %>"><%= date %></option>
-                <% }); %>
+                <% const currentDate = new Date(); %>
+                <% for (let i = 0; i < 24; i++) {
+                      const pastDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+                      const monthYear = pastDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+                %>
+                <option value="<%= monthYear %>"><%= monthYear %></option>
+                <% } %>
               </select>
             </th>
             <th>
@@ -46,53 +59,98 @@
                 <option value="">Filter by Hostel</option>
                 <% const uniqueHostels = Array.from(new Set(expenses.map(expense => expense.hostel.hostelName))); %>
                 <% uniqueHostels.forEach(hostel => { %>
-                  <option value="<%= hostel %>"><%= hostel %></option>
+                <option value="<%= hostel %>"><%= hostel %></option>
                 <% }); %>
               </select>
             </th>
-            <th>Amount</th>
+            <th>
+              <input type="number" id="minAmount" placeholder="Min" min="1000" max="10000" oninput="filterTable()">
+            </th>
+            <th>
+              <input type="number" id="maxAmount" placeholder="Max" min="1000" max="10000" oninput="filterTable()">
+            </th>
             <th>Reason</th>
           </tr>
         </thead>
         <tbody id="expenseLogs">
           <% expenses.forEach(expense => { %>
-            <tr>
-              <td><%= expense.warden.wardenName %></td>
-              <td><%= expense.createdAt.toDateString() %></td>
-              <td><%= expense.hostel.hostelName %></td>
-              <td><%= expense.expenseAmount %></td>
-              <td><%= expense.reason %></td>
-            </tr>
+          <tr>
+            <td><%= expense.warden.wardenName %></td>
+            <td><%= expense.createdAt.toDateString() %></td>
+            <td><%= expense.hostel.hostelName %></td>
+            <td colspan="2">Rs. <%= expense.expenseAmount %></td>
+            <td><%= expense.reason %></td>
+          </tr>
           <% }); %>
         </tbody>
       </table>
     </div>
+    <% } %>
   </div>
   <script>
-    // Event listeners for dropdown changes
+    // Event listeners for dropdown changes and input changes
     document.getElementById('wardenFilter').addEventListener('change', filterTable);
     document.getElementById('dateFilter').addEventListener('change', filterTable);
     document.getElementById('hostelFilter').addEventListener('change', filterTable);
-  
+    document.getElementById('minAmount').addEventListener('input', filterTable);
+    document.getElementById('maxAmount').addEventListener('input', filterTable);
+
+    function updateTotalExpenses(filteredRows) {
+      let total = 0;
+      filteredRows.forEach(row => {
+        const amount = parseFloat(row.querySelector('td:nth-child(4)').textContent.split(' ')[1]); // Extract amount without 'Rs.'
+        total += amount;
+      });
+      document.getElementById('totalExpenses').textContent = `Rs. ${total.toFixed(2)}`;
+    }
+
     function filterTable() {
       const wardenFilter = document.getElementById('wardenFilter').value;
       const dateFilter = document.getElementById('dateFilter').value;
-      const hostelFilter = document.getElementById('hostelFilter').value; 
+      const hostelFilter = document.getElementById('hostelFilter').value;
+      const minAmount = parseFloat(document.getElementById('minAmount').value);
+      const maxAmount = parseFloat(document.getElementById('maxAmount').value);
       const tableRows = document.querySelectorAll('#expenseLogs tr');
-  
+
       tableRows.forEach(row => {
         const wardenName = row.querySelector('td:nth-child(1)').textContent;
         const date = row.querySelector('td:nth-child(2)').textContent;
         const hostelName = row.querySelector('td:nth-child(3)').textContent;
-        if (wardenName.includes(wardenFilter) &&
-            date.includes(dateFilter) &&
-            hostelName.includes(hostelFilter)) {
+        const amount = parseFloat(row.querySelector('td:nth-child(4)').textContent.split(' ')[1]); // Extract amount without 'Rs.'
+
+        const selectedMonth = dateFilter.split(' ')[0];
+        const selectedYear = dateFilter.split(' ')[1];
+
+        const rowDate = new Date(date);
+        const rowMonth = rowDate.toLocaleString('default', {
+          month: 'long'
+        });
+        const rowYear = rowDate.getFullYear();
+
+        const isMonthMatch = selectedMonth === '' || rowMonth === selectedMonth;
+        const isYearMatch = selectedYear === '' || rowYear === parseInt(selectedYear);
+        const isAmountInRange = (isNaN(minAmount) || amount >= minAmount) && (isNaN(maxAmount) || amount <= maxAmount);
+
+        if (
+          wardenName.includes(wardenFilter) &&
+          hostelName.includes(hostelFilter) &&
+          (dateFilter === '' || (isMonthMatch && isYearMatch)) &&
+          isAmountInRange
+        ) {
           row.style.display = '';
         } else {
           row.style.display = 'none';
         }
       });
+
+      const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+      updateTotalExpenses(visibleRows);
     }
+
+    // Initial total expenses calculation
+    const initialTableRows = document.querySelectorAll('#expenseLogs tr');
+    updateTotalExpenses(initialTableRows);
   </script>
 </body>
+
 </html>

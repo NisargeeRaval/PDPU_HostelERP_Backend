@@ -115,7 +115,6 @@ module.exports = class Student {
                     roomDetails[0].student[i].profile = await update_path('student', roomDetails[0].student[i].profile);
                 }
             }
-            console.log(roomDetails);
 
             return res.render('HTML/student/myRoomDetails.ejs', { roomDetails: roomDetails });
         } catch (error) {
@@ -128,7 +127,15 @@ module.exports = class Student {
 
     async load_get_otp_page(req, res) {
         try {
-            return res.render('HTML/student/markAttendance');
+            const student = await student_model.findById(req.user._id);
+            if (student.enrolled == 'false') {
+                const headingMessage = "Cannot access this functionality";
+                const paragraphMessage = "To use this functionality you need to book a room in hostel!";
+                const newRoute = '/student/dashboard';
+                return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            }
+
+            return res.render('HTML/student/markAttendance.ejs');
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while loading the page. Please try again!";

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const attendanceSchema = new mongoose.Schema({
-  date: { type: Date, required: true },
+  date: { type: String, required: true },
   hostel: { type: mongoose.Schema.Types.ObjectId, required: true },
   present: [{ type: mongoose.Schema.Types.ObjectId }],
   absent: [{ type: mongoose.Schema.Types.ObjectId }],

@@ -5,11 +5,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Warden| Attendance</title>
-  <%- include('./nav.ejs') %>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .custom-radio-A {
+      accent-color: red;
+    }
+
+    .custom-radio-P {
+      accent-color: green;
+    }
+
+    .custom-radio-L {
+      accent-color: gray;
+    }
+
+    input[type="radio"][disabled] {
+      cursor: not-allowed;
+    }
+  </style>
+  <%- include('./nav.ejs') %>
 </head>
 
 <body>
@@ -24,9 +41,9 @@
   <div class="container mt-5">
     <!-- Warden, Hostel Name, Date -->
     <div class="mb-4">
-      <p>Warden: <%= wardenName %></p>
-      <p>Hostel: <%= hostelName %></p>
-      <p>Date: <%= currentDate %></p>
+      <p>Warden: <%= templateData.wardenName %></p>
+      <p>Hostel: <%= templateData.hostelName %></p>
+      <p>Date: <%= templateData.currentDate %></p>
     </div>
 
     <!-- Attendance Table -->
@@ -40,24 +57,41 @@
             <th>A</th>
             <th>L</th>
             <th>OTP</th>
-            <th></th> <!-- Empty column for buttons -->
+            <th>Actions</th> <!-- Empty column for buttons -->
           </tr>
         </thead>
         <tbody>
-          <% students.forEach(student => { %>
+          <% templateData.roomData.forEach(room => { %>
+          <% room.students.forEach(student => { %>
           <tr>
-            <td><%= student.students.firstname %> <%= student.students.lastname %></td>
-            <td><%= student.roomNumber %></td>
-            <td><input type="radio" name="attendance_<%= student.name %>" value="P"></td>
-            <td><input type="radio" name="attendance_<%= student.name %>" value="A"></td>
-            <td><input type="radio" name="attendance_<%= student.name %>" value="L"></td>
-            <td><input type="text" name="otp_<%= student.name %>"></td>
+            <td><%= student.name %></td>
+            <td><%= room.roomNumber %></td>
+
+            <% if(student.status.absent === true) {%>
+            <td><input type="radio" name="<%= student._id %>" value="P" disabled></td>
+            <td><input type="radio" name="<%= student._id %>" value="A" checked class="custom-radio-A"></td>
+            <td><input type="radio" name="<%= student._id %>" value="L" disabled></td>
+            <td><input type="text" name="<%= student._id %>"></td>
             <td>
               <button class="btn btn-primary btn-sm"><i class="bi bi-chat-text"></i></button>
               <button class="btn btn-success btn-sm"><i class="bi bi-check"></i></button>
             </td>
+            <% } else if(student.status.present === true) { %>
+            <td><input type="radio" name="<%= student._id %>" value="P" checked class="custom-radio-P"></td>
+            <td><input type="radio" name="<%= student._id %>" value="A" disabled></td>
+            <td><input type="radio" name="<%= student._id %>" value="L" disabled></td>
+            <td></td>
+            <td></td>
+            <% } else if(student.status.onLeave === true) {%>
+            <td><input type="radio" name="<%= student._id %>" value="P" disabled></td>
+            <td><input type="radio" name="<%= student._id %>" value="A" disabled></td>
+            <td><input type="radio" name="<%= student._id %>" value="L" checked class="custom-radio-L"></td>
+            <td></td>
+            <td></td>
+            <% } %>
           </tr>
-          <% }); %>
+          <% }) %>
+          <% }) %>
         </tbody>
       </table>
     </div>

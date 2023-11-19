@@ -1,6 +1,8 @@
 const hostel_model = require('../models/hostelModel');
 const warden_model = require('../models/wardenModel');
 const room_model = require('../models/roomModel');
+const attendance_model = require('../models/attendanceModel');
+const getFormatedDate = require('../services/getFormatedDate');
 const expense_model = require("../models/expenseModel")
 const student_model = require('../models/studentModel');
 const update_path = require('../utilities/response_image_url');
@@ -608,68 +610,74 @@ module.exports = class Warden {
 
     async load_take_attendance_page(req, res) {
         try {
-            const wardenName = req.user.wardenName;
-            const warden_id = req.user._id;
-                
-            const wardenWithHostel = await warden_model.aggregate([
-                {
-                    $match: { _id: new mongoose.Types.ObjectId(warden_id) }
-                },
-                {
-                    $lookup: {
-                        from: 'hostels',
-                        localField: 'hostel',
-                        foreignField: '_id',
-                        as: 'hostelDetails'
-                    }
-                },
-            ]);
+            const currentDate = new Date();
+            const finalDate = await getFormatedDate(currentDate);
 
-            const hostelName = wardenWithHostel[0].hostelDetails[0].hostelName;
-            const hostelID = wardenWithHostel[0].hostelDetails[0]._id;
+            const hostelID = req.user.hostel;
 
-            const currentDate = new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+            const hostel = await hostel_model.findById(hostelID);
+
+            const attendance_result = await attendance_model.findOne({ date: finalDate, hostel: new mongoose.Types.ObjectId(hostelID) });
+
+            if (!attendance_result) {
+                const headingMessage = "Cannot access the attendance page.";
+                const paragraphMessage = "The alloted time for today's attendace time is 08:00 PM to 11:00 PM. Please come back after 08:00 PM.";
+                const newRoute = '/warden/dashboard';
+                return res.render('utilities/responseMessageError.ejs', { headingMessage, paragraphMessage, newRoute });
+            }
+
+            // Get the list of student IDs from attendance_result
+            const studentIDs = [
+                ...attendance_result.present,
+                ...attendance_result.absent,
+                ...attendance_result.leave
+            ];
+
+            // Find student details based on IDs
+            const studentDetails = await student_model.find({ _id: { $in: studentIDs } });
+
+            // Prepare an object with student details including status
+            const studentData = studentDetails.map(student => {
+                const status = {
+                    present: attendance_result.present.includes(student._id),
+                    absent: attendance_result.absent.includes(student._id),
+                    onLeave: attendance_result.leave.includes(student._id)
+                };
+
+                return {
+                    _id: student._id,
+                    name: `${student.firstname} ${student.lastname}`, // Assuming student has firstName and lastName fields
+                    status: status,
+                    // Other student details you want to include
+                };
             });
 
-            const students = await room_model.aggregate([
-                {
-                    $match: { hostelID: hostelID }
-                },
-                {
-                    $lookup: {
-                        from: 'students',
-                        localField: 'user',
-                        foreignField: '_id',
-                        as: 'students'
-                    }
-                },
-                {
-                    $unwind: '$students'
-                },
-                {
-                    $project: {
-                        _id: 1,
-                        roomNumber: 1,
-                        'students.firstname': 1,
-                        'students.lastname': 1
-                    }
-                }
-            ]);
-            return res.render('HTML/warden/takeAttendance.ejs', {
-                wardenName: wardenName,
-                hostelName: hostelName,
+            // Get room data based on student IDs in the room model
+            const roomDetails = await room_model.find({ user: { $in: studentIDs } }).sort({ roomNumber: 1 }) // Sort by roomNumber in ascending order
+                .collation({ locale: "en_US", numericOrdering: true }); // Ensure numeric sorting;
+
+            // Prepare an object with room details
+            const roomData = roomDetails.map(room => ({
+                _id: room._id,
+                roomNumber: room.roomNumber,
+                students: studentData.filter(student => room.user.includes(student._id))
+            }));
+
+            // Prepare an object to pass to the template
+            const templateData = {
+                wardenID: req.user._id,
+                wardenName: req.user.wardenName,
+                roomData: roomData,
                 currentDate: currentDate,
-                students: students
-            });
+                hostelName: hostel.hostelName
+            };
+
+            return res.render('HTML/warden/takeAttendance.ejs', { templateData: templateData });
         } catch (error) {
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while loading page. Reload the page again!";
             const newRoute = '/warden/dashboard';
-            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.render('utilities/responseMessageError.ejs', { headingMessage, paragraphMessage, newRoute });
         }
     }
 };

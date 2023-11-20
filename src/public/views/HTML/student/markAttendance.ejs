@@ -20,20 +20,18 @@
             <h3>Student OTP</h3>
           </div>
           <div class="card-body">
-            <p>Date:</p>
-            <p>Day:</p>
-            <p>Hostel Name:</p>
-            <p>Warden Name:</p>
-            <div class="mb-3">
-              <label for="otpInput" class="form-label">OTP</label>
-              <input type="text" class="form-control" id="otpInput" placeholder="Enter OTP">
-            </div>
+            <p>OTP Sender: <%= decoded.wardenName %> </p>
+            <p>Date: <%= decoded.createdDateAt + " " + decoded.createdTimeAt %></p>
+            <p>Expire: <b> <%= decoded.createdDateAt + " " + decoded.expiredTimeAt %> </b></p>
+            <p>OTP: <b> <%= decoded.OTP %></b></p>
           </div>
+        </div>
+        <div class="alert alert-info mt-3" role="alert">
+          <strong>Note:</strong> Please ensure you use this OTP within the specified time to complete your attendance! In case your OTP get expire then ask warden to send fresh OTP.
         </div>
       </div>
     </div>
   </div>
-
 
 </body>
 

@@ -44,6 +44,9 @@ router.get("/addExpense", jwt_middleware, warden_middlware, (req, res) => Warden
 router.post("/api/addExpense", jwt_middleware, warden_middlware, (req, res) => WardenClass.add_expense(req, res));
 
 const admin_warden = ['admin', 'warden'];
-router.get("/logExpenses", jwt_middleware, multi_role_based_middleware(admin_warden), (req, res) => WardenClass.load_log_expenses(req, res))
-router.get("/takeAttendance", jwt_middleware, warden_middlware, (req, res) => WardenClass.load_take_attendance_page(req, res))
+router.get("/logExpenses", jwt_middleware, multi_role_based_middleware(admin_warden), (req, res) => WardenClass.load_log_expenses(req, res));
+
+router.get("/takeAttendance", jwt_middleware, warden_middlware, (req, res) => WardenClass.load_take_attendance_page(req, res));
+router.post("/api/sendOTPAttendance", jwt_middleware, warden_middlware, (req, res) => WardenClass.send_otp_for_attendance(req, res));
+router.post("/api/verifyOTPAttendance", jwt_middleware, warden_middlware, (req, res) => WardenClass.verify_otp_for_attendance(req, res));
 module.exports = router;

@@ -8,8 +8,11 @@ const student_model = require('../models/studentModel');
 const update_path = require('../utilities/response_image_url');
 const fs = require('fs');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const speakeasy = require('speakeasy');
 const { sendEmailToMultipleUsers } = require('../services/sendEmailService');
 const { default: mongoose } = require('mongoose');
+require('dotenv').config();
 
 module.exports = class Warden {
     constructor() {
@@ -669,7 +672,8 @@ module.exports = class Warden {
                 wardenName: req.user.wardenName,
                 roomData: roomData,
                 currentDate: currentDate,
-                hostelName: hostel.hostelName
+                hostelName: hostel.hostelName,
+                attendance: attendance_result._id.toString()
             };
 
             return res.render('HTML/warden/takeAttendance.ejs', { templateData: templateData });
@@ -678,6 +682,93 @@ module.exports = class Warden {
             const paragraphMessage = "Error while loading page. Reload the page again!";
             const newRoute = '/warden/dashboard';
             return res.render('utilities/responseMessageError.ejs', { headingMessage, paragraphMessage, newRoute });
+        }
+    }
+
+    async send_otp_for_attendance(req, res) {
+        try {
+            const currentDate = new Date();
+
+            const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+            const formattedTime = `${currentDate.getHours().toString().padStart(2, '0')}:${currentDate.getMinutes().toString().padStart(2, '0')}`;
+
+            // Calculate time after 5 minutes
+            const fiveMinutesLater = new Date(currentDate.getTime() + 5 * 60000); // 5 minutes in milliseconds
+            const formattedFiveMinutesLater = `${fiveMinutesLater.getHours().toString().padStart(2, '0')}:${fiveMinutesLater.getMinutes().toString().padStart(2, '0')}`;
+
+            // Generate a time-based OTP
+            const secret = speakeasy.generateSecret({ length: 6 }); // Adjust the length as needed
+            const OTP = speakeasy.totp({
+                secret: secret.base32,
+                encoding: 'base32',
+            });
+
+            const payload = {
+                studentID: req.body.studentID,
+                wardenID: req.user._id,
+                wardenName: req.user.wardenName,
+                createdDateAt: formattedDate,
+                createdTimeAt: formattedTime,
+                expiredTimeAt: formattedFiveMinutesLater,
+                OTP: OTP
+            };
+
+            const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
+
+            await student_model.findByIdAndUpdate(req.body.studentID, { attendanceToken: token }, { new: true });
+
+            return res.status(200).json({ message: 'ok' });
+        } catch (error) {
+            const headingMessage = "Something went Wrong";
+            const paragraphMessage = "Error while sending otp. Try to send otp again!";
+            const newRoute = '/warden/takeAttendance';
+            return res.status(400).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async verify_otp_for_attendance(req, res) {
+        try {
+            const studentID = req.body.studentID;
+            const OTP = req.body.inputOTP;
+            const attendanceID = req.body.attendanceID;
+
+            const student = await student_model.findById(studentID);
+            const attendanceToken = student.attendanceToken;
+
+            if (!attendanceToken) {
+                return res.status(400).json({ message: 'OTP does not exists. Generate new OTP!' });
+            }
+
+            const decoded = jwt.verify(attendanceToken, process.env.JWT_SECRET_KEY);
+
+            const currentDate = new Date();
+
+            const formattedDate = `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`;
+            const formattedTime = `${currentDate.getHours().toString().padStart(2, '0')}:${currentDate.getMinutes().toString().padStart(2, '0')}`;
+
+
+            if (!(formattedDate == decoded.createdDateAt && formattedTime <= decoded.expiredTimeAt)) {
+                return res.status(400).json({ message: 'OTP expired. Generate new OTP!' });
+            }
+
+
+            if (!(OTP == decoded.OTP)) {
+                return res.status(400).json({ message: 'Wrong OTP! Please input correct OTP.' });
+            }
+
+            await attendance_model.findByIdAndUpdate(attendanceID, {
+                $pull: { absent: studentID },
+                $push: { present: studentID }
+            }
+            );
+
+            return res.status(200).json({ message: 'ok' });
+        } catch (error) {
+            console.log(error);
+            const headingMessage = "Something went Wrong";
+            const paragraphMessage = "Error while verifying otp. Try to verify otp again!";
+            const newRoute = '/warden/takeAttendance';
+            return res.status(400).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 };

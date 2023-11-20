@@ -12,5 +12,6 @@ router.get('/profile', jwt_middleware, student_middlware, (req, res) => StudentC
 router.post('/updateProfile', jwt_middleware, student_middlware, (req, res) => StudentClass.update_profile(req, res));
 router.get('/myRoomDetails', jwt_middleware, student_middlware, (req, res) => StudentClass.load_my_room_details_page(req, res));
 router.get("/markAttendance", jwt_middleware, student_middlware, (req, res) => StudentClass.load_get_otp_page(req, res));
+router.get("/viewAttendance", jwt_middleware, student_middlware, (req, res) => StudentClass.load_view_attendance_page(req, res));
 
 module.exports = router;

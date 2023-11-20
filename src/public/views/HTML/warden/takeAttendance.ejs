@@ -30,6 +30,36 @@
 </head>
 
 <body>
+  <!-- Modal for OTP Sent Message -->
+  <div class="modal fade" id="otpSentModal" tabindex="-1" aria-labelledby="otpSentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="background-color: #d4edda;">
+        <div class="modal-header" style="border-bottom: none;">
+          <h5 class="modal-title" id="otpSentModalLabel">OTP Sent</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          OTP has been sent successfully!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for displaying error message -->
+  <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-danger text-white">
+        <div class="modal-header" style="border-bottom: none;">
+          <h5 class="modal-title" id="errorModalLabel">Something went Wrong!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Dynamic error content will be placed here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="container mt-5">
     <div class="row justify-content-center">
       <div class="col-md-10 text-center">
@@ -38,7 +68,10 @@
       </div>
     </div>
   </div>
-  <div class="container mt-5">
+  <div class="container mt-3">
+    <div class="alert alert-info" role="alert">
+      <strong>Note:</strong> Please refresh after every change to get updated data!
+    </div>
     <!-- Warden, Hostel Name, Date -->
     <div class="mb-4">
       <p>Warden: <%= templateData.wardenName %></p>
@@ -68,23 +101,26 @@
             <td><%= room.roomNumber %></td>
 
             <% if(student.status.absent === true) {%>
-            <td><input type="radio" name="<%= student._id %>" value="P" disabled></td>
+            <td><input type="radio" name="<%= student._id %>" value="P" disabled class="custom-radio-P"></td>
             <td><input type="radio" name="<%= student._id %>" value="A" checked class="custom-radio-A"></td>
-            <td><input type="radio" name="<%= student._id %>" value="L" disabled></td>
+            <td><input type="radio" name="<%= student._id %>" value="L" disabled class="custom-radio-L"></td>
             <td><input type="text" name="<%= student._id %>"></td>
             <td>
-              <button class="btn btn-primary btn-sm"><i class="bi bi-chat-text"></i></button>
-              <button class="btn btn-success btn-sm"><i class="bi bi-check"></i></button>
+              <button class="btn btn-primary btn-sm" onclick="sendOTP('<%= student._id %>')">
+                <i class="bi bi-chat-text"></i>
+              </button>
+
+              <button class="btn btn-success btn-sm" onclick="verifyOTP('<%= student._id %>')"><i class="bi bi-check"></i></button>
             </td>
             <% } else if(student.status.present === true) { %>
             <td><input type="radio" name="<%= student._id %>" value="P" checked class="custom-radio-P"></td>
-            <td><input type="radio" name="<%= student._id %>" value="A" disabled></td>
-            <td><input type="radio" name="<%= student._id %>" value="L" disabled></td>
+            <td><input type="radio" name="<%= student._id %>" value="A" disabled class="custom-radio-A"></td>
+            <td><input type="radio" name="<%= student._id %>" value="L" disabled class="custom-radio-L"></td>
             <td></td>
             <td></td>
             <% } else if(student.status.onLeave === true) {%>
-            <td><input type="radio" name="<%= student._id %>" value="P" disabled></td>
-            <td><input type="radio" name="<%= student._id %>" value="A" disabled></td>
+            <td><input type="radio" name="<%= student._id %>" value="P" disabled class="custom-radio-P"></td>
+            <td><input type="radio" name="<%= student._id %>" value="A" disabled class="custom-radio-A"></td>
             <td><input type="radio" name="<%= student._id %>" value="L" checked class="custom-radio-L"></td>
             <td></td>
             <td></td>
@@ -95,12 +131,127 @@
         </tbody>
       </table>
     </div>
-
-    <!-- Submit Button -->
-    <div class="text-center">
-      <button class="btn btn-primary">Submit Attendance</button>
-    </div>
   </div>
+
+  <script>
+    async function sendOTP(studentID) {
+      try {
+
+        const result = await fetch('/warden/api/sendOTPAttendance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            studentID: studentID
+          }),
+        });
+
+        console.log(result.status);
+
+        if (result.status === 200) {
+          const data = await result.json();
+
+          // Trigger the OTP sent modal
+          const myModal = new bootstrap.Modal(document.getElementById('otpSentModal'), {
+            keyboard: false
+          });
+
+          myModal.show();
+
+          // Close the modal after 3 seconds
+          setTimeout(() => {
+            myModal.hide();
+          }, 3000);
+        } else {
+          const data = await result.json();
+
+          const queryString = `?headingMessage=${encodeURIComponent(data.headingMessage)}&paragraphMessage=${encodeURIComponent(data.paragraphMessage)}&newRoute=${encodeURIComponent(data.newRoute)}`;
+
+          window.location.href = '/response/error' + queryString;
+        }
+      } catch (error) {
+
+        const queryString = `?headingMessage=${encodeURIComponent('Something went wrong')}&paragraphMessage=${encodeURIComponent('Error while sending otp. Try to send otp again!')}&newRoute=${encodeURIComponent('/warden/takeAttendance')}`;
+
+        window.location.href = '/response/error' + queryString;
+      }
+    }
+
+    async function verifyOTP(studentID) {
+      try {
+
+        // Select the input element with type="text" and specific name attribute
+        const textInput = document.querySelector(`input[type="text"][name^="${studentID}"]`);
+
+        const inputOTP = textInput.value;
+
+        // Change the radio buttons from A to P and disable the A radio button
+        const radioInputA = document.querySelector(`input[type="radio"][name^="${studentID}"][value="A"]`);
+        const radioInputP = document.querySelector(`input[type="radio"][name^="${studentID}"][value="P"]`);
+
+        const otpInput = document.querySelector(`input[type="text"][name^="${studentID}"]`);
+        const sendOTPButton = document.querySelector(`button[onclick="sendOTP('${studentID}')"]`);
+        const verifyOTPButton = document.querySelector(`button[onclick="verifyOTP('${studentID}')"]`);
+
+        const result = await fetch('/warden/api/verifyOTPAttendance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            studentID: studentID,
+            inputOTP: inputOTP,
+            attendanceID: '<%=templateData.attendance%>'
+          }),
+        });
+
+        if (result.status === 200) {
+          const data = await result.json();
+
+          radioInputA.checked = false; // Uncheck A radio button
+          radioInputA.disabled = true; // Disable A radio button
+          radioInputP.checked = true; // Check P radio button
+          radioInputP.disabled = false;
+
+          // Check if elements exist before attempting to remove
+          if (otpInput) {
+            otpInput.remove();
+          }
+          if (sendOTPButton) {
+            sendOTPButton.remove();
+          }
+          if (verifyOTPButton) {
+            verifyOTPButton.remove();
+          }
+
+        } else {
+          const data = await result.json();
+          const message = data.message;
+
+          // Trigger the OTP sent modal
+          const myModal = new bootstrap.Modal(document.getElementById('errorModal'), {
+            keyboard: false
+          });
+
+          const modalBody = document.querySelector('#errorModal .modal-body');
+          modalBody.textContent = message;
+
+          myModal.show();
+
+          // Close the modal after 3 seconds
+          setTimeout(() => {
+            myModal.hide();
+          }, 3000);
+        }
+      } catch (error) {
+
+        const queryString = `?headingMessage=${encodeURIComponent('Something went wrong')}&paragraphMessage=${encodeURIComponent('Error while verifying otp. Try to verify otp again!')}&newRoute=${encodeURIComponent('/warden/takeAttendance')}`;
+
+        window.location.href = '/response/error' + queryString;
+      }
+    }
+  </script>
 
 </body>
 

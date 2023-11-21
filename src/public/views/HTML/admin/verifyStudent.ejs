@@ -106,35 +106,46 @@
     }
 
     async function rejectStudent() {
-      const rejectionReason = document.getElementById('rejectionReason').value;
+      try {
+        const rejectionReason = document.getElementById('rejectionReason').value;
 
-      if (!rejectionReason || rejectionReason.split(/\s+/).length < 10) {
-        alert('Please provide a rejection reason with at least 10 words.');
-        return;
-      }
-
-      if (currentStudentId) {
-        const response = await fetch('/admin/api/verifyStudent', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            studentId: currentStudentId,
-            status: 'block',
-            reason: rejectionReason
-          })
-        });
-
-        if (response.ok) {
-          const card = document.getElementById(currentStudentId);
-          if (card) {
-            card.parentNode.removeChild(card);
-            checkNoStudents(); // Check if there are no students after removal
-          }
-        } else {
-          console.error('Request failed:', response);
+        if (!rejectionReason || rejectionReason.split(/\s+/).length < 10) {
+          alert('Please provide a rejection reason with at least 10 words.');
+          return;
         }
+
+        if (currentStudentId) {
+          const result = await fetch('/admin/api/verifyStudent', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              studentId: currentStudentId,
+              status: 'block',
+              reason: rejectionReason
+            })
+          });
+
+          if (result.status === 200) {
+            const data = await result.json();
+
+            const queryString = `?headingMessage=${encodeURIComponent('User rejected succesfully!')}&paragraphMessage=${encodeURIComponent('Email sent to user to update details!')}&newRoute=${encodeURIComponent('/admin/verifyStudent')}`;
+
+            window.location.href = '/response/success' + queryString;
+          } else {
+            const data = await result.json();
+
+            const queryString = `?headingMessage=${encodeURIComponent(data.headingMessage)}&paragraphMessage=${encodeURIComponent(data.paragraphMessage)}&newRoute=${encodeURIComponent(data.newRoute)}`;
+
+            window.location.href = '/response/error' + queryString;
+          }
+        }
+
+      } catch (error) {
+        const queryString = `?headingMessage=${encodeURIComponent('Something went wrong!')}&paragraphMessage=${encodeURIComponent('Error while rejecting student! Try to contact developer.')}&newRoute=${encodeURIComponent('/admin/dashboard')}`;
+
+        window.location.href = '/response/error' + queryString;
       }
 
       currentStudentId = null;
@@ -144,7 +155,7 @@
 
     async function acceptStudent(studentId) {
       try {
-        const response = await fetch('/admin/api/verifyStudent', {
+        const result = await fetch('/admin/api/verifyStudent', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -155,32 +166,23 @@
           }),
         });
 
-        if (response.ok) {
-          const card = document.getElementById(studentId);
-          if (card) {
-            card.parentNode.removeChild(card);
-            checkNoStudents(); // Check if there are no students after removal
-          }
+        if (result.status === 200) {
+          const data = await result.json();
+
+          const queryString = `?headingMessage=${encodeURIComponent('User accepted succesfully!')}&paragraphMessage=${encodeURIComponent('Credentials sent to user as well as their parents.')}&newRoute=${encodeURIComponent('/admin/verifyStudent')}`;
+
+          window.location.href = '/response/success' + queryString;
         } else {
-          console.error('Request failed:', response);
+          const data = await result.json();
+
+          const queryString = `?headingMessage=${encodeURIComponent(data.headingMessage)}&paragraphMessage=${encodeURIComponent(data.paragraphMessage)}&newRoute=${encodeURIComponent(data.newRoute)}`;
+
+          window.location.href = '/response/error' + queryString;
         }
       } catch (error) {
-        console.error('Request failed:', error);
-      }
-    }
+        const queryString = `?headingMessage=${encodeURIComponent('Something went wrong!')}&paragraphMessage=${encodeURIComponent('Error while verifying student! Try to contact developer.')}&newRoute=${encodeURIComponent('/admin/dashboard')}`;
 
-    // Function to check if there are no students and display the message
-    function checkNoStudents() {
-      const students = document.querySelectorAll('.card');
-      if (students.length === 0) {
-        // Display your message
-        const container = document.getElementById('studentMessage');
-        container.innerHTML = `
-          <div class="alert alert-info custom-alert" role="alert">
-            All students are validated!
-          </div>
-        `;
-        container.style.display = 'block';
+        window.location.href = '/response/error' + queryString;
       }
     }
   </script>

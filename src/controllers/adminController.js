@@ -104,8 +104,8 @@ module.exports = class Admin {
             if (!user) {
                 const headingMessage = "Something went wrong";
                 const paragraphMessage = "Error while updating student status. Student data not found!";
-                const newRoute = '/admin/dashboard';
-                res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                const newRoute = '/admin/verifyStudent';
+                return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
             }
 
             if (status == 'block') {
@@ -265,8 +265,8 @@ module.exports = class Admin {
                 if (existingUser) {
                     const headingMessage = "Error can not register!";
                     const paragraphMessage = "Parents already exists!";
-                    const newRoute = '/admin/dashboard';
-                    return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+                    const newRoute = '/admin/verifyStudent';
+                    return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
                 const parentPassword = await passwordGenerator(15);
@@ -372,12 +372,13 @@ module.exports = class Admin {
                 }
             }
 
-            return res.status(200).JSON({ data: 'ok' });
+            return res.status(200).json({ data: 'ok' });
         } catch (error) {
+            console.log(error);
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while updating student status. Reload update again!";
             const newRoute = '/admin/verifyStudent';
-            res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 

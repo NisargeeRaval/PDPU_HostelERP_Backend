@@ -2,6 +2,7 @@ const hostel_model = require('../models/hostelModel');
 const warden_model = require('../models/wardenModel');
 const room_model = require('../models/roomModel');
 const attendance_model = require('../models/attendanceModel');
+const complaint_model = require('../models/complaintModel');
 const getFormatedDate = require('../services/getFormatedDate');
 const expense_model = require("../models/expenseModel")
 const student_model = require('../models/studentModel');
@@ -764,11 +765,39 @@ module.exports = class Warden {
 
             return res.status(200).json({ message: 'ok' });
         } catch (error) {
-            console.log(error);
             const headingMessage = "Something went Wrong";
             const paragraphMessage = "Error while verifying otp. Try to verify otp again!";
             const newRoute = '/warden/takeAttendance';
             return res.status(400).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async load_view_complaint_page(req, res) {
+        try {
+            const complaint = await complaint_model.find({ hostel: req.user.hostel, warden: null });
+
+            return res.render('HTML/warden/complaint.ejs', { complaint: complaint });
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while loading the page. Please try again!";
+            const newRoute = '/warden/dashboard';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async warden_solved_complain(req, res) {
+        try {
+            const complaintId = req.body.complaintId;
+            const wardenId = req.user._id;
+
+            await complaint_model.findByIdAndUpdate(complaintId, { warden: wardenId });
+
+            return res.status(200).json({ data: 'ok' });
+        } catch (error) {
+            const headingMessage = "Something went wrong!";
+            const paragraphMessage = "Error while updating complaint status. Update status again!";
+            const newRoute = '/warden/complaint';
+            return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 };

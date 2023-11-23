@@ -27,7 +27,7 @@ module.exports = class Basic {
                 } else if (role == 'warden') {
                     return res.render('HTML/warden/wardenHome.ejs');
                 } else if (role == 'parents') {
-                    console.log('left to work on redirecting to parents dashboard');
+                    return res.render('HTML/parents/parentsHome.ejs');
                 }
             }
 
@@ -171,12 +171,19 @@ module.exports = class Basic {
                     return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
                 }
 
+                const student = await student_model.findOne({ parentsid: parents._id }).select('-password');
+
                 const payload = {
                     _id: parents._id,
                     mobileno: parents.mobileno,
                     email: parents.email,
                     name: parents.name,
-                    role: 'parents'
+                    role: 'parents',
+                    student_rollno: student.rollno,
+                    student_id: student._id,
+                    student_email: student.email,
+                    student_firstName: student.firstname,
+                    student_lastName: student.lastname
                 };
 
                 const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);

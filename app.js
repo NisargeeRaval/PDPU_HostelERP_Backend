@@ -32,6 +32,7 @@ const hostelRoutes = require('./src/routes/hostelRoutes');
 const wardenRoutes = require('./src/routes/wardenRoutes');
 const studentRoutes = require('./src/routes/studentRoutes');
 const roomRoutes = require('./src/routes/roomRoutes');
+const parentsRoutes = require('./src/routes/parentsRoutes');
 const responseMessageRoutes = require('./src/routes/responseMessageRoutes');
 
 // Your routes go here
@@ -41,6 +42,7 @@ app.use('/hostel', hostelRoutes);
 app.use('/warden', wardenRoutes);
 app.use('/student', studentRoutes);
 app.use('/room', roomRoutes);
+app.use('/parents', parentsRoutes);
 app.use('/response', responseMessageRoutes);
 
 // Connect to MongoDB and then start the server

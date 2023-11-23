@@ -2,6 +2,7 @@ const room_controller = require("../controllers/roomController");
 const student_model = require('../models/studentModel');
 const room_model = require('../models/roomModel');
 const attendance_model = require('../models/attendanceModel');
+const complaint_model = require('../models/complaintModel');
 const getFormatedDate = require('../services/getFormatedDate');
 const update_path = require('../utilities/response_image_url');
 const { default: mongoose } = require("mongoose");
@@ -163,9 +164,21 @@ module.exports = class Student {
 
     async load_view_attendance_page(req, res) {
         try {
-            const studentName = req.user.firstname + " " + req.user.lastname;
-            const rollNo = req.user.rollno;
-            const studentID = new mongoose.Types.ObjectId(req.user._id);
+            let studentName;
+            let rollNo;
+            let studentID;
+
+            if (req.user.role == 'student') {
+                studentName = req.user.firstname + " " + req.user.lastname;
+                rollNo = req.user.rollno;
+                studentID = new mongoose.Types.ObjectId(req.user._id);
+            }
+
+            if (req.user.role == 'parents') {
+                studentName = req.user.student_firstName + " " + req.user.student_lastName;
+                rollNo = req.user.student_rollno;
+                studentID = new mongoose.Types.ObjectId(req.user.student_id);
+            }
 
             const currentDate = new Date();
             const finalDate = await getFormatedDate(currentDate);
@@ -218,11 +231,92 @@ module.exports = class Student {
 
             return res.render('HTML/student/viewAttendance.ejs', { templateData: templateData });
         } catch (error) {
-            console.log(error);
             const headingMessage = "Something went wrong";
             const paragraphMessage = "Error while loading the page. Please try again!";
             const newRoute = '/student/dashboard';
             return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async load_view_complains_page(req, res) {
+        try {
+            const student = await student_model.findById(req.user._id);
+
+            if (student.enrolled == 'false') {
+                const headingMessage = "Cannot access this functionality";
+                const paragraphMessage = "To use this functionality you need to book a room in hostel!";
+                const newRoute = '/student/dashboard';
+                return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+            }
+
+            const complaint = await complaint_model.find({ student: req.user._id });
+
+            //make a lookup for who solve the problem
+
+            return res.render('HTML/student/complaint.ejs', { complaint: complaint });
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while loading the page. Please try again!";
+            const newRoute = '/student/dashboard';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async add_complaint(req, res) {
+        try {
+            const room = await room_model.findOne({ user: req.user._id });
+
+            const hostelID = room.hostelID;
+
+            const complaint = new complaint_model({
+                subject: req.body.subject,
+                description: req.body.description,
+                student: req.user._id,
+                hostel: hostelID,
+                warden: null
+            });
+
+            await complaint.save();
+
+            const headingMessage = "Complaint send to warden succesfully!";
+            const paragraphMessage = "Please wait for warden response!";
+            const newRoute = '/student/dashboard';
+            return res.render('utilities/responseMessageSuccess.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        } catch (error) {
+            const headingMessage = "Something went wrong";
+            const paragraphMessage = "Error while adding complaint. Please try again!";
+            const newRoute = '/student/dashboard';
+            return res.render('utilities/responseMessageError.ejs', { headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async accept_complaint(req, res) {
+        try {
+            const complaintId = req.body.complaintId;
+
+            await complaint_model.findByIdAndDelete(complaintId);
+
+            return res.status(200).json({ data: 'ok' });
+        } catch (error) {
+            const headingMessage = "Something went wrong!";
+            const paragraphMessage = "Error while accepting complaint. Accept complaint again!";
+            const newRoute = '/student/complaint';
+            return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
+        }
+    }
+
+    async reject_complaint(req, res) {
+        try {
+            const complaintId = req.body.complaintId;
+
+            await complaint_model.findByIdAndUpdate(complaintId, { warden: null });
+
+            return res.status(200).json({ data: 'ok' });
+        } catch (error) {
+            const headingMessage = "Something went wrong!";
+            const paragraphMessage = "Error while rejecting complaint. Reject complaint again!";
+            const newRoute = '/student/complaint';
+            return res.status(403).json({ headingMessage: headingMessage, paragraphMessage: paragraphMessage, newRoute: newRoute });
         }
     }
 }

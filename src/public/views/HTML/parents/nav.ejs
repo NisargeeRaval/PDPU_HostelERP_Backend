@@ -6,36 +6,17 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
   <div class="container">
-    <a class="navbar-brand" href="/warden/dashboard">Hostel ERP Warden</a>
+    <a class="navbar-brand" href="/parents/dashboard">Hostel ERP Parents</a>
     <div class="ml-auto">
       <ul class="navbar-nav">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="hostelManagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Hostel
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="hostelManagementDropdown">
-            <li><a class="dropdown-item" href="/hostel/hostelLayout">View Hostel</a></li>
-            <li><a class="dropdown-item" href="#">Grant Leave</a></li>
-            <li><a class="dropdown-item" href="/warden/takeAttendance">Attendance</a></li>
-            <li><a class="dropdown-item" href="/warden/addExpense">Add Expense</a></li>
-            <li><a class="dropdown-item" href="/warden/logExpenses">View Expenses</a></li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="studentManagementDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Student
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="studentManagementDropdown">
-            <li><a class="dropdown-item" href="/admin/viewStudent">Search Student</a></li>
-            <li><a class="dropdown-item" href="/warden/complaint">Complaints</a></li>
-            <li><a class="dropdown-item" href="/warden/sendEmail">Send Email</a></li>
-          </ul>
+        <li class="nav-item">
+          <a class="nav-link" href="/student/viewAttendance">View Attendance</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#" id="logoutButton" onclick="logout()">Logout</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/warden/profile" id="logoutButton">Profile</a>
+          <a class="nav-link" href="/parents/profile" id="logoutButton">Profile</a>
         </li>
       </ul>
     </div>

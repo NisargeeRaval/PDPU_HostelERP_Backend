@@ -49,4 +49,6 @@ router.get("/logExpenses", jwt_middleware, multi_role_based_middleware(admin_war
 router.get("/takeAttendance", jwt_middleware, warden_middlware, (req, res) => WardenClass.load_take_attendance_page(req, res));
 router.post("/api/sendOTPAttendance", jwt_middleware, warden_middlware, (req, res) => WardenClass.send_otp_for_attendance(req, res));
 router.post("/api/verifyOTPAttendance", jwt_middleware, warden_middlware, (req, res) => WardenClass.verify_otp_for_attendance(req, res));
+router.get("/complaint", jwt_middleware, warden_middlware, (req, res) => WardenClass.load_view_complaint_page(req, res));
+router.post("/api/solvedComplaint", jwt_middleware, warden_middlware, (req, res) => WardenClass.warden_solved_complain(req, res));
 module.exports = router;

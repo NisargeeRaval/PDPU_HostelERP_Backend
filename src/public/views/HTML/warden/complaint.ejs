@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Warden| Complaint</title>
+  <!-- Link to Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-R0G6pqVhY5H0f2un3ibFKK5F0qtAp9oFFH0d1vjoUOFQgptvR3Yb9pf22ZnCFT33" crossorigin="anonymous"></script>
+  <%- include('./nav.ejs') %>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Display Complaints -->
+    <div class="container mt-3">
+      <div class="row justify-content-center">
+        <div class="col-md-10 text-center">
+          <h1>View Complaints</h1>
+          <hr class="my-4 border-4"> <!-- Use 'border-4' to make the line thicker -->
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+
+        <% if (Array.isArray(complaint) && complaint.length === 0) { %>
+        <div class="container">
+          <div class="alert alert-info custom-alert" role="alert">
+            You have no complaint!
+          </div>
+        </div>
+        <% } else { %>
+        <% complaint.forEach(function(complaint) { %>
+
+        <div class="card mb-3" id="<%= complaint._id %>">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-9 d-flex align-items-center">
+                <h5 class="card-title"><%= complaint.subject %></h5>
+              </div>
+              <div class="col-3 text-end">
+                <button type="button" class="btn btn-success" onclick="solved('<%= complaint._id %>')">Solved</button>
+                <i class="fa-solid fa-chevron-down fa-2xl" style="cursor: pointer;" onclick="toggleDetails(this)"></i>
+              </div>
+              <div class="details" style="display: none;">
+                <p class="card-text">Description: <%= complaint.description %></p>
+                <p class="card-text">Status: <%= complaint.solved %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <% }); %>
+        <% } %>
+      </div>
+    </div>
+
+
+  </div>
+
+  <script>
+    function toggleDetails(button) {
+      const card = button.closest('.card');
+      const details = card.querySelector('.details');
+      details.style.display = details.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function solved(complaintId) {
+      try {
+        const result = await fetch('/warden/api/solvedComplaint', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            complaintId: complaintId,
+          }),
+        });
+
+        if (result.status === 200) {
+          const data = await result.json();
+
+          const queryString = `?headingMessage=${encodeURIComponent('Status set succesfully!')}&paragraphMessage=${encodeURIComponent('Complaint status set to solved! Wait for student to approve. You will get notification.')}&newRoute=${encodeURIComponent('/warden/dashboard')}`;
+
+          window.location.href = '/response/success' + queryString;
+        } else {
+          const data = await result.json();
+
+          const queryString = `?headingMessage=${encodeURIComponent(data.headingMessage)}&paragraphMessage=${encodeURIComponent(data.paragraphMessage)}&newRoute=${encodeURIComponent(data.newRoute)}`;
+
+          window.location.href = '/response/error' + queryString;
+        }
+      } catch (error) {
+        const queryString = `?headingMessage=${encodeURIComponent('Something went wrong!')}&paragraphMessage=${encodeURIComponent('Error while updating complaint status. Update status again!')}&newRoute=${encodeURIComponent('/warden/dashboard')}`;
+
+        window.location.href = '/response/error' + queryString;
+      }
+    }
+  </script>
+
+  <!-- Bootstrap Icons (Bi) -->
+  <script src="https://unpkg.com/bootstrap-icons/font/bootstrap-icons.css"></script>
+  <!-- Link to Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"></script>
+</body>
+
+</html>
